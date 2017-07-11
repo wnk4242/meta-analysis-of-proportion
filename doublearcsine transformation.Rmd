@@ -7,7 +7,6 @@ library(weightr)
 dat=read.csv("D:\\mydata\\ammirati.csv",header=T,sep=",")
 ```
 ```{r calculate overall effect sizes and subgroup es using the Freeman-Tukey double arcsine transformation}
-#note that I changed transf.ies to ies.ft, transf.pes to pes.ft, transf.pes.m to pes.ft.endoscopy, pes.m to pes.endoscopy
 ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
 pes.ft=rma(yi,vi,data=ies.ft,method="FE",weighted=TRUE)
 pes.ft.endoscopy=rma(yi,vi,data=ies.ft,subset=procedure=="endoscopy",method="FE")
