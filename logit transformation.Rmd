@@ -7,13 +7,10 @@ library(weightr)
 dat=read.csv("D:\\mydata\\wu.csv",header=T,sep=",")
 ```
 ```{r calculate overall effect size and subgroup es using the logit transformation}
-#note I changed transf.ies to ies.logit
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
-#note I changed transf.pes to pes.logit
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
 #pes=pooled effect size that has been transformed back
 pes=predict(pes.logit,transf=transf.ilogit,digits=5)
-#note I change pes.m to pes.birthcohort, pes.n to pes.others
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studytype=="Birth cohort",method="DL")
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.logit.others=rma(yi,vi,data=ies.logit,subset=studytype=="Others",method="DL")
