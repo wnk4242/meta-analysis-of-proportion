@@ -10,7 +10,6 @@ library(weightr)
 dat=read.csv("D:\\mydata\\xia.csv",header=T,sep=",")
 ```
 ```{r calculate overall and subgroup effect sizes without transformation}
-#note I changed pes.m to pes.guangdong;moda to province;m to Guangdong
 ies.all=escalc(xi=cases,ni=total,measure="PR",data=dat) #note I changed r.ies to ies.all
 pes.all=rma(yi,vi,data=ies.all,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
 pes.guangdong=rma(yi,vi,data=ies.all,subset=province=="Guangdong",method="DL")
@@ -57,7 +56,7 @@ text(-2,1.1,pos=4,cex=0.7,font=3,
      bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p), 
      ", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")), 
      "; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
-#add summary polygons for subgroups
+#Add summary polygons for subgroups
 #Guangdong
 addpoly(pes.guangdong,
         row=11.4,#position
