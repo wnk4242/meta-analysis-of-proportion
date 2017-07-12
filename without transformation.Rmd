@@ -109,6 +109,6 @@ regtest(pes.guangs,model="lm",predictor="sei")
 ranktest(pes.guangs)
 ```
 ```{r Vevea and Hedges (1995) Weight-Function Model}
-weightfunct(ies.guangs$yi,ies.guangs$vi,steps=0.05) #?
+weightfunct(ies.guangs$yi,ies.guangs$vi,steps=0.05) 
 ```
 
