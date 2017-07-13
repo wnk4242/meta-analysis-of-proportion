@@ -1,0 +1,114 @@
+```{r install required packages}
+#install.packages('metafor')
+```
+```{r load required packages}
+library(metafor)
+library(meta)
+library(weightr)
+```
+```{r read data files}
+dat=read.csv("D:\\mydata\\xia.csv",header=T,sep=",")
+```
+```{r calculate overall and subgroup effect sizes without transformation}
+ies.all=escalc(xi=cases,ni=total,measure="PR",data=dat) #note I changed r.ies to ies.all
+pes.all=rma(yi,vi,data=ies.all,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
+pes.guangdong=rma(yi,vi,data=ies.all,subset=province=="Guangdong",method="DL")
+pes.guangxi=rma(yi,vi,data=ies.all,subset=province=="Guangxi",method="DL")
+print(pes.all,digits=3)
+print(pes.guangdong,digits=3)
+print(pes.guangxi,digits=3)
+```
+```{r forest plot using raw proportions }
+dat=subset(dat, province %in% c("Guangdong","Guangxi"))#extract two Guangs
+ies.guangs=escalc(xi=cases,ni=total,measure="PR",data=dat)
+pes.guangs=rma(yi,vi,data=ies.guangs,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
+forest(pes.guangs,
+       ylim=c(-2,30),#vertical limits
+       xlim=c(-2,2.1),#horizontal limits
+       rows=c(25:13,7.6:2.6),#1 is the row above the line below;ylim and rows both determine the position of studies
+       main="Effect size by province (RE Model)",
+       ilab=cbind(data=dat$cases, dat$total),#show cases and total
+       ilab.xpos=c(-0.8, -0.4),#position of cases and total
+       refline=pes.all$b,#reference line position
+       at=c(seq(from=0,to=1.1,by=0.2)), #legendary lenghth
+       xlab="Proportion",#legendary lable
+       mlab="",
+       cex=0.8,#overall size
+       font=6,
+       digits=3
+       )
+#Add lables
+text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")#-2=x,17=y;font=2=bold
+text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))#use c() to posit subgroup lables
+text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
+text(1.3,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
+#Add heterogeneity stats
+#Two provinces
+text(-2,-1.1,pos=4,cex=0.7,font=1,
+     bquote(paste("All studies(Q = ",.(formatC(pes.guangs$QE, digits=1, format="f")), ", df = ", .(pes.guangs$k - pes.guangs$p),", p = ", .(formatC(pes.guangs$QEp, digits=2, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.guangs$I2, digits=1, format="f")), "%",")")))
+#Guangdong
+text(-2,11.4,pos=4,cex=0.7,font=1,
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.guangdong$QE, digits=1, format="f")), ", df = ", .(pes.guangdong$k - pes.guangdong$p),", p = ", .(formatC(pes.guangdong$QEp, digits=2, format="f")),
+     "; ", I^2, " = ",.(formatC(pes.guangdong$I2, digits=1, format="f")), "%",")")))
+#Guangxi
+text(-2,1.1,pos=4,cex=0.7,font=3,
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p), 
+     ", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
+#Add summary polygons for subgroups
+#Guangdong
+addpoly(pes.guangdong,
+        row=11.4,#position
+        cex=0.7,font=1,#font size and bold
+        mlab="",
+        digits=3)
+#Guangxi
+addpoly(pes.guangxi, 
+        row=1.1, 
+        cex=0.7, font=1,
+        mlab="",  
+        digits=3)
+dev.copy(png,'Effect size by province.png')
+dev.off()
+```
+```{r check evidence of heterogeneity}
+print(pes.guangs,digits=2)
+```
+```{r baujat plot}
+baujat(pes.guangs)
+```
+```{r A set of diagnostics to id potential outliers and influential cases}
+pes.inf=influence(pes.guangs)
+plot(pes.inf)
+```
+```{r leave one out analysis}
+leave1out(pes.guangs)
+```
+```{r subgroup analysis without transformation}
+#assume a common variance
+subganal.guangs=rma(yi,vi,data=ies.guangs,mods=~province,method="DL")
+print(subganal.guangs)
+#do not assume a common variance (metaprop mode)
+#dat.diffvar= data.frame(estimate=c(pes.guangdong$b, pes.guangxi$b),stderror=c(pes.guangdong$se, pes.guangxi$se),province = c("Guangdong","Guangxi"), tau2=round(c(pes.guangdong$tau2, pes.guangxi$tau2),3))
+#subganal.guangs=rma(estimate, sei=stderror, mods = ~ province, method="FE", data=dat.diffvar, digits=4)
+#print(subganal.guangs,digits=3)
+```
+```{r funnel plot with raw proportions}
+funnel(pes.guangs)
+```
+```{r trim and fill with raw proportions}
+pes.trimfill=trimfill(pes.guangs)
+funnel(pes.trimfill)
+print(pes.trimfill,digits=2)
+```
+```{r Egger's regression test with raw proportions}
+regtest(pes.guangs,model="lm",predictor="sei")
+```
+```{r rank correlation (Kendall's tall) with raw proporitons}
+ranktest(pes.guangs)
+```
+```{r Vevea and Hedges (1995) Weight-Function Model}
+weightfunct(ies.guangs$yi,ies.guangs$vi,steps=0.05) 
+```
+
