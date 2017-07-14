@@ -4,21 +4,21 @@ library(meta)
 library(weightr)
 ```
 ```{r read data files}
-setwd("D:/mygithubproj/metaprops")
-dat=read.csv("wu.csv",header=T,sep=",")
+setwd("D:/mydata")
+dat=read.csv("filename.csv",header=T,sep=",")
 ```
 ```{r calculate overall effect size and subgroup es using the logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
 #pes=pooled effect size that has been transformed back
 pes=predict(pes.logit,transf=transf.ilogit,digits=5)
-pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studytype=="Birth cohort",method="DL")
-pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
-pes.logit.others=rma(yi,vi,data=ies.logit,subset=studytype=="Others",method="DL")
-pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
+pes.logit.mal1=rma(yi,vi,data=ies.logit,subset=moderatora=="level1",method="DL")
+pes.mal1=predict(pes.logit.mal1,transf=transf.ilogit,digits=5)
+pes.logit.mal2=rma(yi,vi,data=ies.logit,subset=moderatora=="level2",method="DL")
+pes.mal2=predict(pes.logit.mal2,transf=transf.ilogit,digits=5)
 print(pes,digits=6)
-print(pes.birthcohort,digits=6)
-print(pes.others,digits=6)
+print(pes.mal1,digits=6)
+print(pes.mal2,digits=6)
 ```
 ```{r forest plot using logit transformation }
 pes.forest=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
@@ -30,28 +30,28 @@ forest(pes.forest$yi,slab=paste(dat$author,dat$year, sep=", "),ci.lb=pes.forest$
        ilab=cbind(data=dat$cases, dat$total),
        ilab.xpos=c(-0.002,-0.001),
        at=c(seq(from=0,to=0.004,by=0.001)), 
-       main="Effect size by study type (RE Model)",
+       main="Effect size by moderator A (RE Model)",
        xlab="Proportion",
        cex=0.8,#overall size
        font=6,
        digits=5)
 text(-0.005, 23,pos=4,cex=0.8,font=6,"Author(s), Year")#-2=x,17=y;font=2=bold
-text(-0.005,c(10,20.5),pos=4, cex=0.8,font=6,c("Others", "Birth Cohort"))#use c() to posit subgroup lables
+text(-0.005,c(10,20.5),pos=4, cex=0.8,font=6,c("mal2", "mal1"))#use c() to posit subgroup lables
 text(c(-0.0022,-0.0012), 23,pos=4,cex=0.8,font=6,c("Cases", "Total"))
 text(0.003,23,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
-addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,digits=6,cex=0.7,mlab="")
-addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.5,digits=6,cex=0.7,mlab="")
+addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=12.7,digits=6,cex=0.7,mlab="")
+addpoly(pes.mal2$pred,ci.lb=pes.mal2$ci.lb,ci.ub=pes.mal2$ci.ub,row=-2.5,digits=6,cex=0.7,mlab="")
 addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,digits=6,cex=0.7,mlab="")
 text(-0.005,-5,pos=4,cex=0.7,
      bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1, format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), 
      "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
 text(-0.005,12.7,pos=4,cex=0.7,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.birthcohort$QE, digits=1, format="f")), ", df = ", .(pes.logit.birthcohort$k - pes.logit.birthcohort$p),", p = ", .(formatC(pes.logit.birthcohort$QEp, digits=2, format="f")),
-     "; ", I^2, " = ",.(formatC(pes.logit.birthcohort$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal1$QE, digits=1, format="f")), ", df = ", .(pes.logit.mal1$k - pes.logit.mal1$p),", p = ", .(formatC(pes.logit.mal1$QEp, digits=2, format="f")),
+     "; ", I^2, " = ",.(formatC(pes.logit.mal1$I2, digits=1, format="f")), "%",")")))
 text(-0.005,-2.8,pos=4,cex=0.7,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), 
-     ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal2$QE, digits=1, format="f")),", df = ", .(pes.logit.mal2$k - pes.logit.mal2$p), 
+     ", p = ", .(formatC(pes.logit.mal2$QEp, digits=2, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.logit.mal2$I2, digits=1, format="f")), "%",")")))
 abline(h=-4)
 ```
 ```{r check evidence of heterogeneity}
@@ -71,12 +71,12 @@ print(pes.leave1out)
 ```
 ```{r subgroup analysis using logit transformation}
 #if you assume a common variance
-#subganal.studytype=rma(yi,vi, data=ies.logit, mods = ~ studytype, method="DL")
-#print(subganal.studytype)
+#subganal.moderatora=rma(yi,vi, data=ies.logit, mods = ~ moderatora, method="DL")
+#print(subganal.moderatora)
 #if you do not assume a common variance
-dat.diffvar= data.frame(estimate=c(pes.logit.birthcohort$b, pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studytype=rma(estimate, sei=stderror, mods = ~ studytype, method="FE", data=dat.diffvar, digits=4)
-print(subganal.studytype,digits=3)
+dat.diffvar= data.frame(estimate=c(pes.logit.mal1$b, pes.logit.mal2$b),stderror=c(pes.logit.mal1$se, pes.logit.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.logit.mal1$tau2, pes.logit.mal2$tau2),3))
+subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar, digits=4)
+print(subganal.moderatora,digits=3)
 ```
 ```{r funnel plot with logit transformed data}
 #tansformed scale:logit odds

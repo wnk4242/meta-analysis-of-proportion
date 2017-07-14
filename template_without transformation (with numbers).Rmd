@@ -9,7 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r read data files}
-dat=read.csv("your/working/directory/filename.csv",header=T,sep=",")
+setwd("D:/mydata")
+dat=read.csv("filename.csv",header=T,sep=",")
 ```
 ```{r calculate overall and subgroup effect sizes without transformation}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
@@ -25,7 +26,7 @@ forest(pes,
        ylim=c(-2,30),#vertical limits
        xlim=c(-2,2.1),#horizontal limits
        rows=c(25:13,7.6:2.6),#1 is the row above the line below;ylim and rows both determine the position of studies
-       main="Effect size by moderator a (RE Model)",
+       main="Effect size by moderator A (RE Model)",
        ilab=cbind(data=dat$cases, dat$total),#show cases and total
        ilab.xpos=c(-0.8, -0.4),#position of cases and total
        refline=pes$b,#reference line position
