@@ -66,7 +66,7 @@ print(pes.logit,digits=2)
 baujat(pes.logit)
 ```
 ```{r A set of diagnostic tests}
-pes.inf=influence(pes.logit)#note I changed inf.pes to pes.inf
+pes.inf=influence(pes.logit)
 print(pes.inf,digits=2)
 plot(pes.inf)
 ```
@@ -76,12 +76,12 @@ print(pes.leave1out)
 ```
 ```{r subgroup analysis using logit transformation}
 #if you assume a common variance
-#subganal.studytype=rma(yi,vi, data=ies.logit, mods = ~ studytype, method="DL")
-#print(subganal.studytype)
+subganal.studytype=rma(yi,vi, data=ies.logit, mods = ~ studytype, method="DL")
+print(subganal.studytype)
 #if you do not assume a common variance
-dat.diffvar= data.frame(estimate=c(pes.logit.birthcohort$b, pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studytype=rma(estimate, sei=stderror, mods = ~ studytype, method="FE", data=dat.diffvar, digits=4)
-print(subganal.studytype,digits=3)
+#dat.diffvar= data.frame(estimate=c(pes.logit.birthcohort$b, pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
+#subganal.studytype=rma(estimate, sei=stderror, mods = ~ studytype, method="FE", data=dat.diffvar, digits=4)
+#print(subganal.studytype,digits=3)
 ```
 ```{r funnel plot with logit transformed data}
 #tansformed scale:logit odds
