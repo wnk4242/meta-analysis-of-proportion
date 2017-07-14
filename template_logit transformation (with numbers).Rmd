@@ -1,3 +1,8 @@
+```{r install required packages}
+#install.packages('metafor')
+#install.packages('meta')
+#install.packages('weightr')
+```
 ```{r load required packages}
 library(metafor)
 library(meta)
@@ -11,14 +16,14 @@ dat=read.csv("filename.csv",header=T,sep=",")
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
 #pes=pooled effect size that has been transformed back
-pes=predict(pes.logit,transf=transf.ilogit,digits=5)
+pes=predict(pes.logit,transf=transf.ilogit)
 pes.logit.mal1=rma(yi,vi,data=ies.logit,subset=moderatora=="level1",method="DL")
-pes.mal1=predict(pes.logit.mal1,transf=transf.ilogit,digits=5)
+pes.mal1=predict(pes.logit.mal1,transf=transf.ilogit)
 pes.logit.mal2=rma(yi,vi,data=ies.logit,subset=moderatora=="level2",method="DL")
-pes.mal2=predict(pes.logit.mal2,transf=transf.ilogit,digits=5)
-print(pes,digits=6)
-print(pes.mal1,digits=6)
-print(pes.mal2,digits=6)
+pes.mal2=predict(pes.logit.mal2,transf=transf.ilogit)
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
 ```
 ```{r forest plot using logit transformation }
 pes.forest=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
@@ -33,40 +38,40 @@ forest(pes.forest$yi,slab=paste(dat$author,dat$year, sep=", "),ci.lb=pes.forest$
        main="Effect size by moderator A (RE Model)",
        xlab="Proportion",
        cex=0.8,#overall size
-       font=6,
-       digits=5)
+       font=6
+       )
 text(-0.005, 23,pos=4,cex=0.8,font=6,"Author(s), Year")#-2=x,17=y;font=2=bold
 text(-0.005,c(10,20.5),pos=4, cex=0.8,font=6,c("mal2", "mal1"))#use c() to posit subgroup lables
 text(c(-0.0022,-0.0012), 23,pos=4,cex=0.8,font=6,c("Cases", "Total"))
 text(0.003,23,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
-addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=12.7,digits=6,cex=0.7,mlab="")
-addpoly(pes.mal2$pred,ci.lb=pes.mal2$ci.lb,ci.ub=pes.mal2$ci.ub,row=-2.5,digits=6,cex=0.7,mlab="")
-addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,digits=6,cex=0.7,mlab="")
+addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=12.7,cex=0.7,mlab="")
+addpoly(pes.mal2$pred,ci.lb=pes.mal2$ci.lb,ci.ub=pes.mal2$ci.ub,row=-2.5,cex=0.7,mlab="")
+addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,cex=0.7,mlab="")
 text(-0.005,-5,pos=4,cex=0.7,
-     bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1, format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.logit$I2, format="f")), "%",")")))
 text(-0.005,12.7,pos=4,cex=0.7,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal1$QE, digits=1, format="f")), ", df = ", .(pes.logit.mal1$k - pes.logit.mal1$p),", p = ", .(formatC(pes.logit.mal1$QEp, digits=2, format="f")),
-     "; ", I^2, " = ",.(formatC(pes.logit.mal1$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal1$QE, format="f")), ", df = ", .(pes.logit.mal1$k - pes.logit.mal1$p),", p = ", .(formatC(pes.logit.mal1$QEp, format="f")),
+     "; ", I^2, " = ",.(formatC(pes.logit.mal1$I2, format="f")), "%",")")))
 text(-0.005,-2.8,pos=4,cex=0.7,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal2$QE, digits=1, format="f")),", df = ", .(pes.logit.mal2$k - pes.logit.mal2$p), 
-     ", p = ", .(formatC(pes.logit.mal2$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.logit.mal2$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal2$QE, format="f")),", df = ", .(pes.logit.mal2$k - pes.logit.mal2$p), 
+     ", p = ", .(formatC(pes.logit.mal2$QEp, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.logit.mal2$I2, format="f")), "%",")")))
 abline(h=-4)
 ```
 ```{r check evidence of heterogeneity}
-print(pes.logit,digits=2)
+print(pes.logit)
 ```
 ```{r baujat plot}
 baujat(pes.logit)
 ```
 ```{r A set of diagnostic tests}
 pes.inf=influence(pes.logit)#note I changed inf.pes to pes.inf
-print(pes.inf,digits=2)
+print(pes.inf)
 plot(pes.inf)
 ```
 ```{r leave one out analysis}
-pes.leave1out=leave1out(pes.logit,transf=transf.ilogit,digits=6)
+pes.leave1out=leave1out(pes.logit,transf=transf.ilogit)
 print(pes.leave1out)
 ```
 ```{r subgroup analysis using logit transformation}
@@ -75,8 +80,8 @@ print(pes.leave1out)
 #print(subganal.moderatora)
 #if you do not assume a common variance
 dat.diffvar= data.frame(estimate=c(pes.logit.mal1$b, pes.logit.mal2$b),stderror=c(pes.logit.mal1$se, pes.logit.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.logit.mal1$tau2, pes.logit.mal2$tau2),3))
-subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar, digits=4)
-print(subganal.moderatora,digits=3)
+subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
+print(subganal.moderatora)
 ```
 ```{r funnel plot with logit transformed data}
 #tansformed scale:logit odds
@@ -89,10 +94,10 @@ pes.trimfill=trimfill(pes.logit)
 #transformed scale
 #funnel(pes.trimfill)
 #original scale
-funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
+funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
 #pes.adjusted stands for adjusted values after trim and fill
 pes.adjusted=predict(pes.trimfill,transf=transf.ilogit)
-print(pes.adjusted,digits=6)
+print(pes.adjusted)
 ```
 ```{r Egger's regression test with transformed proportions}
 regtest(pes.logit,model="lm",predictor="sei")

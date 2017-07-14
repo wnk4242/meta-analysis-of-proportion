@@ -17,9 +17,9 @@ ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
 pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
 pes.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
 pes.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
-print(pes,digits=3)
-print(pes.mal1,digits=3)
-print(pes.mal2,digits=3)
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
 ```
 ```{r forest plot using raw proportions }
 forest(pes,
@@ -34,8 +34,7 @@ forest(pes,
        xlab="Proportion",#legendary lable
        mlab="",
        cex=0.8,#overall size
-       font=6,
-       digits=3
+       font=6
        )
 #Add lables
 text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")#-2=x,17=y;font=2=bold
@@ -45,35 +44,35 @@ text(1.3,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
 #Add heterogeneity stats
 #All studies
 text(-2,-1.1,pos=4,cex=0.7,font=1,
-     bquote(paste("All studies(Q = ",.(formatC(pes$QE, digits=1, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("All studies(Q = ",.(formatC(pes$QE, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes$I2, format="f")), "%",")")))
 #Level 1 of moderator a
 text(-2,11.4,pos=4,cex=0.7,font=1,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.mal1$QE, digits=1, format="f")), ", df = ", .(pes.mal1$k - pes.mal1$p),", p = ", .(formatC(pes.mal1$QEp, digits=2, format="f")),
-     "; ", I^2, " = ",.(formatC(pes.mal1$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.mal1$QE, format="f")), ", df = ", .(pes.mal1$k - pes.mal1$p),", p = ", .(formatC(pes.mal1$QEp, format="f")),
+     "; ", I^2, " = ",.(formatC(pes.mal1$I2, format="f")), "%",")")))
 #level 2 of moderator a
 text(-2,1.1,pos=4,cex=0.7,font=3,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.mal2$QE, digits=1, format="f")),", df = ", .(pes.mal2$k - pes.mal2$p), 
-     ", p = ", .(formatC(pes.mal2$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.mal2$I2, digits=1, format="f")), "%",")")))
+     bquote(paste("Subtotal(Q = ",.(formatC(pes.mal2$QE, format="f")),", df = ", .(pes.mal2$k - pes.mal2$p), 
+     ", p = ", .(formatC(pes.mal2$QEp, format="f")), 
+     "; ", I^2, " = ",.(formatC(pes.mal2$I2, format="f")), "%",")")))
 #Add summary polygons for subgroups
 #level 1 of moderator a
 addpoly(pes.mal1,
         row=11.4,#position
         cex=0.7,font=1,#font size and bold
-        mlab="",
-        digits=3)
+        mlab="" 
+        )
 #level 2 of moderator a
 addpoly(pes.mal2, 
         row=1.1, 
         cex=0.7, font=1,
-        mlab="",  
-        digits=3)
+        mlab="" 
+        )
 dev.copy(png,'Effect size by moderator a.png')
 dev.off()
 ```
 ```{r check evidence of heterogeneity}
-print(pes,digits=2)
+print(pes)
 ```
 ```{r baujat plot}
 baujat(pes)
@@ -91,8 +90,8 @@ subganal.moderatora=rma(yi,vi,data=ies,mods=~moderatora,method="DL")
 print(subganal.moderatora)
 #do not assume a common variance (metaprop mode)
 #dat.diffvar= data.frame(estimate=c(pes.mal1$b, pes.mal2$b),stderror=c(pes.mal1$se, pes.mal2$se),moderatora = c("level1","level2"), tau2=round(c(pes.mal1$tau2, pes.mal2$tau2),3))
-#subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar, digits=4)
-#print(subganal.moderatora,digits=3)
+#subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
+#print(subganal.moderatora)
 ```
 ```{r funnel plot with raw proportions}
 funnel(pes)
@@ -100,7 +99,7 @@ funnel(pes)
 ```{r trim and fill with raw proportions}
 pes.trimfill=trimfill(pes)
 funnel(pes.trimfill)
-print(pes.trimfill,digits=2)
+print(pes.trimfill)
 ```
 ```{r Egger's regression test with raw proportions}
 regtest(pes,model="lm",predictor="sei")
