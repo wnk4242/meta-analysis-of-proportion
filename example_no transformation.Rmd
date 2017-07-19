@@ -32,7 +32,7 @@ forest(pes.guangs,
        main="Effect size by province (RE Model)",
        ilab=cbind(data=dat$cases, dat$total),#show cases and total
        ilab.xpos=c(-0.8, -0.4),#position of cases and total
-       refline=pes.all$b,#reference line position
+       refline=pes.guangs$b,#reference line position
        at=c(seq(from=0,to=1.1,by=0.2)), #legendary lenghth
        xlab="Proportion",#legendary lable
        mlab="",
