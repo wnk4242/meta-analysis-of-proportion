@@ -1,0 +1,280 @@
+-我将原来的三个rmarkdown文件合并为一个了，这样能够方便您对代码的处理，减轻工作量。
+-生成树状图的语句我改成了更为简单的语句，能够减轻您的工作量，具体原因请看树状图那里的语句解释。
+-新加了一个meta回归分析的功能，语句很简单也很少量。因为树状图简化了，总体工作量跟以前一样，可能还减少了。
+-提供给您三个数据文件，请分别用不同的数据转换方式对这三个数据文件进行分析。不需要对xia.csv进行数据转换即可对数据进行荟萃分析；需要对wu.csv的数据进行logit转换后再进行荟萃分析；需要对ammirati.csv的数据进行double arcsine转换后再进行荟萃分析。
+-您可以先用这个rmarkdown文件对上述数据分别进行荟萃分析后，记录下得到的结果，然后您制作好Shiny app后再用您制作的Shiny app分别对这三个数据进行荟萃分析，看看两次得到的结果是否一样。您最后传给我视频时我也会进行对比，如果结果一样说明这个Shiny app是可行的。
+
+我希望的界面是这样的：
+-首先有一个选项让用户上传csv文件（Upload your dataset in a csv. document）。
+-下面一个选项让用户选择是用哪种转换（Select the method of transformation）：没有转换（No transformation）、Logit转换（Logit transformation）、Freeman-Tukey double arcsine转换（Freeman-Tukey double arcsine transformation）。
+-下面一个选项是计算效应量时用哪种模式，用户可选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
+-下面一个选项是是否有亚组效应量计算和分析（Subgroup effect size calculation and  analysis），在一个下拉菜单里用户可以选择根据哪个moderator计算亚组的效应量（Select the moderator you would work with，选项显示的是用户给moderator起的名字）。
+-下面一个选项是对树状图进行设置（Forest plot）。用户可以在一个下拉列表里选择对原数据进行哪种转换（不转换、logit转换、double arcsine转换）。还有一个选项问用户是否绘制分组还是不分组的树状图，用户可以在下拉菜单里选根据哪个moderator分组（Select a moderator），选项是不分组（No moderator）、moderatora、moderatorb...以此类推（这些都是用户给moderator起的名字）。还能让用户选择用哪种模式进行绘制，包括DL、REML、ML（下面有具体解释）。
+-下面一个选项是meta回归分析（Meta-regression），用户可以勾选根据哪个或哪几个moderator进行分析（Select the moderator(s) you would work with），选项显示的是moderator1、moderator2、moderator3...以此类推（这些都是用户给moderator起的名字）。
+-最后一个选项是Egger's regression test，用户可以选择是用"lm"模式还是"rma"模式（Select a model，然后选"lm"或"rma"）。
+-用户必须上传csv格式的数据文件，输入数据的格式参考我发给您的数据文件。数据第一列命名为author，即作者；第二列为year，即发表时间；第三列为cases，即事件数；第四列为total，即被试总人数；下面一列或多列为亚组分析时需要的数据，这列的数据为分类变量（catergorical variable），用户可以自己在csv文件里给这列数据命名；最后一列或多列是进行meta回归分析是用的数据，这列的数据为数值变量（continuous variable)，用户可以自己在csv文件里给这列数据命名。
+-以上内容在下面有更详细的解释。
+
+-请在醒目处写上这个Shiny app的名称：Meta-Analysis of Single Proportions
+-请留出一块区域供我自己写一些对这个Shiny app功能的解释还有我署名的地方。
+-这个Shiny一定是全英文的，不要出现中文。英文就用我给您写好的那些。
+-请按照我写的代码的顺序展示结果（除非技术上无法实现）。
+-请注意，我用moderatora、moderatorb、moderatorc表示分类变量，moderator1、moderator2、moderator3表示连续型变量。
+-这里有个类似的Shiny app也许可以给您提供一定灵感：http://kylehamilton.net/shiny/MAVIS/
+
+```{r install required packages}
+install.packages('metafor')
+install.packages('meta')
+install.packages('weightr')
+```
+```{r load required packages}
+library(metafor)
+library(meta)
+library(weightr)
+```
+```{r read data files}
+#D:/mydata这个目录是我电脑里存储数据文件的位置
+#filename.csv是一个概括的名字，用户可以给自己的csv数据文件起名字。
+setwd("D:/mydata")
+dat=read.csv("filename.csv",header=T,sep=",")
+```
+```{r Calculate overall effect size and subgroup effect sizes with no data transformation}
+#这个chunk里的语句不会对数据进行转换。escalc()命令是计算每个研究的效应量，ies是individual effect size的意思。
+#rma()就是把上面单个研究的效应量合并;此处的method=""是让用户选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
+#pes.mal1和pes.mal2是计算每个亚组的平均效应量。mal1和mal2即moderatoralevel1和moderatoralevel2。我举例来解释一下。用户也许假设年龄阶段会影响研究结果，那他就把每个研究里被试的平均年龄当作一个影响因素（moderatora），其中小于20岁是一个水平（level1），大于20岁是另一个水平 (level2）。他想看看小于20岁的被试的结果是否比大于20岁的被试的研究结果有所差别。如果他认为还存在其他影响因素，他还可以在数据文件中插入新的一列，也就是moderatorb。还可以有moderatorc，以此类推。水平至少有两个，可以有好几个，我这里只给出两个水平，您可以一次类推。
+#pes是pooled effect size，这是最终结果，以率为单位表示的所有研究的平均效应量。
+ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
+pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
+pes.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
+pes.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
+```
+```{r Calculate overall effect size and subgroup effect sizes with logit transformation}
+#这个chunk里的语句首先会对数据进行logit转换。escalc()命令是对数据进行logit转换，可得到每一个研究经过logit公式转换后的效应量,ies.logit是individual effect size.logit的意思。
+#rma()就是把上面单个研究的效应量合并，此时得到的合并效应量仍然是经过logit公式转换后的效应量（即，单位并不是率），pes.logit是pooled effect size.logit的意思;此处的method=""是让用户选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
+#pes.logit.mal1和pes.logit.mal2是计算每个亚组的平均效应量。mal1和mal2即moderatoralevel1和moderatoralevel2。
+#pes是pooled effect size，这是最终结果，以率为单位表示的所有研究的平均效应量。predict()中的transf=transf.ilogit是把经过logit转换的数据再转换回来的语句，就是再次以率的形式表示（原数据就是事件数除以总人数=率）。
+ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
+pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
+pes.logit.mal1=rma(yi,vi,data=ies.logit,subset=moderatora=="level1",method="DL")
+pes.logit.mal2=rma(yi,vi,data=ies.logit,subset=moderatora=="level2",method="DL")
+pes=predict(pes.logit,transf=transf.ilogit)
+pes.mal1=predict(pes.logit.mal1,transf=transf.ilogit)
+pes.mal2=predict(pes.logit.mal2,transf=transf.ilogit)
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
+```
+```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
+#这个chunk里的语句首先会对数据进行double arcsine转换。escalc()命令是对数据进行double arcsine转换，可得到每一个研究经过double arcsine公式转换后的效应量,ies.ft是individual effect size.freeman-tukey的意思。
+#rma()就是把上面单个研究的效应量合并，此时得到的合并效应量仍然是经过double arcsine公式转换后的效应量（即，单位并不是率），pes.ft是pooled effect size.freeman-tukey的意思;此处的method=""是让用户选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
+#pes.ft.mal1和pes.ft.mal2是计算每个亚组的平均效应量。mal1和mal2即moderatoralevel1和moderatoralevel2。
+#pes是pooled effect size，这是最终结果，以率为单位表示的所有研究的平均效应量。predict()中的transf=transf.ipft.hm,targ=list(ni=dat$total)是把经过double arcsine转换的数据再转换回来的语句，就是再次以率的形式表示（原数据就是事件数除以总人数=率）。
+ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
+pes.ft=rma(yi,vi,data=ies.ft,method="DL",weighted=TRUE)
+pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="DL")
+pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="DL")
+pes=predict(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal1=predict(pes.ft.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal2=predict(pes.ft.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
+```
+```{r Forest plot with no data transformation}
+#树状图。用户可以在一个下拉列表里选择对原数据进行哪种转换（不转换、logit转换、logit转换）。用户可以选择是否绘制亚组的树状图，也就是设置一个选项，给用户一个下拉菜单，选项为：不分组；根据moderatora分组或根据moderatorb分组，以此类推。byvar=是分组的命令，删掉这个命令就是不分组。用户还可以选择是在什么模式下绘制树状图，即可以对method.tau=""这个语句进行设置，模式包括DL、REML、ML。
+#树状图是用meta程序包实现的。这个markdown里只有这一个地方用的meta程序包，其他命令（除了最后的weightfunct）都是用metafor程序包实现的。之所以选择meta程序包做树状图是因为可以自动生成树状图，而metafor程序包需要用户自己绘制，非常繁琐。这样也减轻我和您的工作量。
+#树状图需要设置一个选项从而让用户把图保存到本地。
+#sm=""是选择数据转换方法；这里，PRAW是不进行数据转换
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PRAW",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_raw.png",width=1000,height=1000)
+forest(pes.forest)
+dev.off()
+```
+```{r Forest plot with logit transformation}
+#同上
+#sm=""是选择数据转换方法；这里，PLOGIT是进行logit转换
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PLOGIT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_logit.png",width=1000,height=1000)
+forest(pes.forest)
+dev.off()
+```
+```{r Forest plot with double arcsine transformation}
+#同上
+#sm=""是选择数据转换方法；这里，PFT是进行double arcsine转换
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_ft.png",width=1000,height=1000)
+forest(pes.forest)
+dev.off()
+```
+```{r Heterogeneity test with no data transformation}
+#输出异质性检验结果
+print(pes)
+print(pes.mal1)
+print(pes.mal2)
+```
+```{r Heterogeneity test with logit transformation}
+#同上
+print(pes.logit)
+print(pes.logit.mal1)
+print(pes.logit.mal2)
+```
+```{r Heterogeneity test with double arcsine transformation}
+#同上
+print(pes.ft)
+print(pes.ft.mal1)
+print(pes.ft.mal2)
+```
+```{r Baujat plot with no data transformation}
+#检验异常值的图
+baujat(pes)
+```
+```{r Baujat plot with logit transformation}
+#同上
+baujat(pes.logit)
+```
+```{r Baujat plot with double arcsine transformation}
+#同上
+baujat(pes.ft)
+```
+```{r Diagnostic tests with no data transformation}
+#检验异常值的图
+inf=influence(pes)
+print(inf)
+plot(inf)
+```
+```{r Diagnostic tests with logit transformation}
+#同上
+inf=influence(pes.logit)
+print(inf)
+plot(inf)
+```
+```{r Diagnostic tests with double arcsine transformation}
+#同上
+inf=influence(pes.ft)
+print(inf)
+plot(inf)
+```
+```{r Leave-one-out analysis with no data transformation}
+#按照顺序，挨个将纳入的研究中的其中一个剔除，然后计算剩下的研究的平均效应量。
+leave1out(pes)
+```
+```{r Leave-one-out analysis with logit transformation}
+#同上
+pes.leave1out=leave1out(pes.logit,transf=transf.ilogit)
+print(pes.leave1out)
+```
+```{r Leave-one-out analysis with double artcsine transformation}
+#同上
+pes.leave1out=leave1out(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
+print(pes.leave1out)
+```
+```{r Subgroup analysis with no data transformation}
+#亚组分析。这个有别于亚组效应量计算，上面是计算亚组的平均效应量，这里是对比亚组之间有没有显著差异。用户可以选择他们想进行分析的亚组，比如选moderatora或是moderatorb或是moderatorc（单选），以此类推。method=""可以选FE，DL，ML，REML。subganal.moderatora的意思是subgroup analysis.moderatora。
+subganal.moderatora=rma(yi,vi, data=ies, mods=~moderatora,method="DL")
+print(subganal.moderatora)
+```
+```{r Subgroup analysis with logit transformation}
+#同上
+subganal.moderatora=rma(yi,vi, data=ies.logit, mods=~moderatora, method="DL")
+print(subganal.moderatora)
+```
+```{r Subgroup analysis with double arcsine transformation}
+#同上
+subganal.moderatora=rma(yi,vi, data=ies.ft, mods=~moderatora, method="DL")
+print(subganal.moderatora)
+```
+```{r Meta-regression with no data transformation}
+#meta回归分析。这里的moderator是连续型变量，而非像前面的subganal.moderatora里的moderator是分类变量。同样，用户可以设置多个moderator，如moderator1，moderator2，moderator3，以此类推（这里是多选，如果有两个及以上的moderator同时选择，请看我#后面写的那句）；method=""可以选择FE，DL，REML，以及ML。mreg.mod1指meta-regression.moderator1。
+mreg.mod1=rma(yi,vi,data=ies,mods =~moderator1,method="REML",test="z")
+#mreg.mod1=rma(yi,vi,data=ies,mods =~moderator1+moderator2+moderator3,method="REML",test="z")
+print(mreg.mod1)
+```
+```{r Meta-regression with logit transformation}
+#同上
+mreg.mod1=rma(yi,vi,data=ies.logit,mods=~moderator1,method="REML",test="z")
+print(mreg.mod1)
+```
+```{r Meta-regression with double arcsine transformation}
+#同上
+mreg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+print(mreg.mod1)
+```
+```{r Funnel plot with no data transformation}
+#漏斗图。需要设置一个选项从而让用户把图保存到本地。
+png("funnel_raw.png",width=1000,height=1000)
+funnel(pes,yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Funnel plot with logit transformation}
+#同上
+png("funnel_logit.png",width=1000,height=1000)
+funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Funnel plot with double arcsine transformation}
+#同上
+png("funnel_ft.png",width=1000,height=1000)
+funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Trim and fill plot with no data transformation}
+#对上面的漏斗图进行trim and fill处理后的漏斗图。需要设置一个选项从而让用户把图保存到本地。
+pes.trimfill=trimfill(pes)
+png("trimfill_raw.png",width=1000,height=1000)
+funnel(pes.trimfill,yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Trim and fill plot with logit transformation}
+#同上
+pes.trimfill=trimfill(pes.logit)
+png("trimfill_logit.png",width=1000,height=1000)
+funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Trim and fill plot with double arcsine transformation}
+#同上
+pes.trimfill=trimfill(pes.ft)
+png("trimfill_ft.png",width=1000,height=1000)
+funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Egger's regression test with no transformation}
+#检验发表偏倚的Egger's test；我希望用户可以选是用lm模型进行检测或是rma模型，即model="lm"或是model="rma"
+regtest(pes,model="lm",predictor="sei")
+```
+```{r Egger's regression test with logit transformation}
+#同上
+regtest(pes.logit,model="lm",predictor="sei")
+```
+```{r Egger's regression test with double arcsine transformation}
+#同上
+regtest(pes.ft,model="lm",predictor="sei")
+```
+```{r Rank correlation with no transformation}
+#检验发表偏倚的Rank correlation test。
+ranktest(pes)
+```
+```{r Rank correlation with logit transformation}
+#同上
+ranktest(pes.logit)
+```
+```{r Rank correlation with double arcsine transformation}
+#同上
+ranktest(pes.ft)
+```
+```{r Vevea and Hedges Weight-Function Model with no transformation}
+#检验发表偏倚的一种检测。
+weightfunct(ies$yi,ies$vi,steps=0.05) 
+```
+```{r Vevea and Hedges Weight-Function Model with logit transformation}
+#同上
+weightfunct(ies.logit$yi,ies.logit$vi,steps=0.05)
+```
+```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
+#同上
+#用weightfunct()对ammarati那个数据进行分析，无法得到结果，这不是语句的问题，是数据本身性质的问题。
+weightfunct(ies.ft$yi,ies.ft$vi,steps=0.05)
+```
