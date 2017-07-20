@@ -1,22 +1,22 @@
-```{r install required packages}
+```{r Install required packages}
 #install.packages('metafor')
 #install.packages('meta')
 #install.packages('weightr')
 ```
-```{r load required packages}
+```{r Load required packages}
 library(metafor)
 library(meta)
 library(weightr)
 ```
-```{r read data files}
+```{r Read data files}
 setwd("D:/mydata")
-dat=read.csv("filename.csv",header=T,sep=",")
+dat=read.csv("firstauthoryear.csv",header=T,sep=",") 
 ```
-```{r calculate overall effect sizes and subgroup es using the Freeman-Tukey double arcsine transformation}
+```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
 ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
-pes.ft=rma(yi,vi,data=ies.ft,method="FE",weighted=TRUE)
-pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="FE")
-pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="FE")
+pes.ft=rma(yi,vi,data=ies.ft,method="DL",weighted=TRUE) #method to choose: FE, DL, REML, ML
+pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="DL")
+pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="DL")
 pes=predict(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
 pes.mal1=predict(pes.ft.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
 pes.mal2=predict(pes.ft.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
@@ -27,7 +27,14 @@ print(pes)
 print(pes.mal1)
 print(pes.mal2)
 ```
-```{r forest plot using double arcsine transformed data}
+
+```{r Forest plot with double arcsine transformation using metaprop}
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_ft.png",width=1000,height=1000)
+forest(pes.forest)
+dev.off()
+```
+```{r Forest plot with double arcsine transformation using metafor}
 pes.forest=summary(ies.ft,transf=transf.ipft,ni=dat$total)
 forest(pes.forest$yi,ci.lb=pes.forest$ci.lb,ci.ub=pes.forest$ci.ub,
        ylim=c(-2,41),#vertical limits
@@ -62,52 +69,63 @@ text(-2,0.5,pos=4,cex=0.8,
      "; ", I^2, " = ",.(formatC(pes.ft.mal2$I2, format="f")), "%",")")))
 abline(h=-2)
 ```
-```{r check evidence of heterogeneity}
+
+```{r Heterogeneity test with double arcsine transformation}
 print(pes.ft)
 print(pes.ft.mal1)
 print(pes.ft.mal2)
 ```
-```{r baujat plot}
+```{r Baujat plot with double arcsine transformation}
 baujat(pes.ft)
 ```
-```{r A set of diagnostic tests}
-pes.inf=influence(pes.ft)#note I changed inf.pes to pes.inf
+```{r Diagnostic tests with double arcsine transformation}
+pes.inf=influence(pes.ft)
 print(pes.inf)
 plot(pes.inf)
 ```
-```{r leave one out analysis}
+```{r Leave-one-out analysis with double artcsine transformation}
 pes.leave1out=leave1out(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.leave1out)
 ```
-```{r subgroup analysis}
-#if you assume a common variance
-subganal.moderatora=rma(yi,vi, data=ies.ft, mods = ~ moderatora, method="FE")
+```{r Subgroup analysis with double arcsine transformation}
+#If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
+subganal.moderatora=rma(yi,vi, data=ies.ft, mods = ~ moderatora, method="DL")
 print(subganal.moderatora)
-#if you do not assume a common variance
+#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
 #dat.diffvar= data.frame(estimate=c(pes.ft.mal1$b, pes.ft.mal2$b),stderror=c(pes.ft.mal1$se, pes.ft.mal2$se),moderatora = c("level1","level2"), tau2=round(c(pes.ft.mal1$tau2, pes.ft.mal2$tau2),3))
 #subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
 #print(subganal.moderatora)
 ```
-```{r funnel plot with double arcsine transformed data}
-#transformed scale:double arcsine transformed proportion
-#funnel(pes.ft,yaxis="sei")
-#original scale
-funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+```{r Meta-regression with double arcsine transformation}
+mreg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+print(mreg.mod1)
 ```
-```{r trim and fill with double arcsine transformed data}
+```{r Funnel plot with double arcsine transformation}
+png("funnel_ft.png",width=1000,height=1000)
+#If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
+#funnel(pes.ft,yaxis="sei")
+#If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
+funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+dev.off()
+```
+```{r Trim and fill plot with double arcsine transformation}
 pes.trimfill=trimfill(pes.ft)
-#funnel(pes.trimfill)#transformed scale
-funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")#original scale
+png("trimfill_ft.png",width=1000,height=1000)
+#If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
+#funnel(pes.trimfill)
+#If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
+funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+dev.off()
 pes.adjusted=predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.adjusted)
 ```
-```{r Egger's regression test with transformed proportions}
-regtest(pes.ft,model="lm",predictor="sei")
+```{r Egger's regression test with double arcsine transformation}
+regtest(pes.ft,model="rma",predictor="sei")
 ```
-```{r rank correlation (Kendall's tall) with transformed data}
+```{r Rank correlation with double arcsine transformation}
 ranktest(pes.ft)
 ```
-```{r Vevea and Hedges (1995) Weight-Function Model}
+```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
 weightfunct(ies.ft$yi,ies.ft$vi,steps=0.05)
 ```
 
