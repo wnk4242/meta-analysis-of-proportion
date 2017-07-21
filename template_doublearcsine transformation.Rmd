@@ -9,8 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("your working directory") 
-dat=read.csv("1stauthorpubyear.csv",header=T,sep=",") 
+setwd("D:/mydata") 
+dat=read.csv("ammirati.csv",header=T,sep=",") 
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
 ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
@@ -68,10 +68,10 @@ forest(ies.summary$yi,
        ilab=cbind(data=dat$cases, dat$total),
        ilab.xpos=c(-0.8, -0.5),
        rows=c(36:20, 13:2),
-       ylim=c(-2,41),
-       xlim=c(-2,2.1),
        at=c(seq(from=0,to=0.5,by=0.1)), 
        refline=pes$pred,
+       ylim=c(-2,41),
+       xlim=c(-2,2.1),
        cex=1,
        font=6,
        main="Effect size by moderator a (RE model)",
@@ -120,6 +120,18 @@ print(subganal.moderatora)
 ```{r Meta-regression with double arcsine transformation}
 mreg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
 print(mreg.mod1)
+```
+```{r Bubble plot with double arcsine transformed data}
+wi=1/sqrt(ies.ft$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+pes=predict(mreg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
+plot(ies.ft$moderator1,transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
+lines(0:40,pes$pred)
+lines(0:40,pes$ci.lb,lty="dashed")
+lines(0:40,pes$ci.ub,lty="dashed")
+ids <- c(1,2)
+pos <- c(3)
+text(ies.ft$moderator1[ids], transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Funnel plot with double arcsine transformation}
 png("funnel_ft.png",width=1000,height=1000)
