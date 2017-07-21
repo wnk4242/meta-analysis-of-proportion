@@ -136,9 +136,10 @@ text(ies.logit$moderator1[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, 
 ```{r Funnel plot with logit transformation}
 png("funnel_logit.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
-funnel(pes.logit,yaxis="sei")
+#funnel(pes.logit,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-#funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
+funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
+dev.off()
 ```
 ```{r Trim and fill plot with logit transformation}
 pes.trimfill=trimfill(pes.logit)
