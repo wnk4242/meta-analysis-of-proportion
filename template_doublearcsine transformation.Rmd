@@ -9,8 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("D:/mydata") 
-dat=read.csv("ammirati.csv",header=T,sep=",") 
+setwd("your working directory")
+dat=read.csv("1stauthorpubyear.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
 ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
@@ -124,11 +124,11 @@ print(mreg.mod1)
 ```{r Bubble plot with double arcsine transformed data}
 wi=1/sqrt(ies.ft$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes=predict(mreg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.bb=predict(mreg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
 plot(ies.ft$moderator1,transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
-lines(0:40,pes$pred)
-lines(0:40,pes$ci.lb,lty="dashed")
-lines(0:40,pes$ci.ub,lty="dashed")
+lines(0:40,pes.bb$pred)
+lines(0:40,pes.bb$ci.lb,lty="dashed")
+lines(0:40,pes.bb$ci.ub,lty="dashed")
 ids <- c(1,2)
 pos <- c(3)
 text(ies.ft$moderator1[ids], transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)

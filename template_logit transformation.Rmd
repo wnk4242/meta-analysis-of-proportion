@@ -9,8 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("D:/mydata")
-dat=read.csv("wu.csv",header=T,sep=",")
+setwd("your working directory")
+dat=read.csv("1stauthorpubyear.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
@@ -124,11 +124,11 @@ print(mreg.mod1)
 ```{r Bubble plot with logit transformed data}
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes=predict(mreg.mod1,newmods=c(0:40),transf=transf.ilogit)
+pes.bb=predict(mreg.mod1,newmods=c(0:40),transf=transf.ilogit)
 plot(ies.logit$moderator1,transf.ilogit(ies.logit$yi),cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
-lines(0:40,pes$pred)
-lines(0:40,pes$ci.lb,lty="dashed")
-lines(0:40,pes$ci.ub,lty="dashed")
+lines(0:40,pes.bb$pred)
+lines(0:40,pes.bb$ci.lb,lty="dashed")
+lines(0:40,pes.bb$ci.ub,lty="dashed")
 ids <- c(1:6)
 pos <- c(1)
 text(ies.logit$moderator1[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)

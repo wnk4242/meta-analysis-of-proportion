@@ -1,117 +1,126 @@
-```{r install required packages}
+```{r Install required packages}
 #install.packages('metafor')
 #install.packages('meta')
 #install.packages('weightr')
 ```
-```{r load required packages}
+```{r Load required packages}
 library(metafor)
 library(meta)
 library(weightr)
 ```
-```{r read data files}
+```{r Read data files}
 setwd("D:/mygithubproj/metaprops")
 dat=read.csv("xia.csv",header=T,sep=",")
 ```
-```{r calculate overall and subgroup effect sizes without transformation}
-ies.all=escalc(xi=cases,ni=total,measure="PR",data=dat) #note I changed r.ies to ies.all
-pes.all=rma(yi,vi,data=ies.all,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
-pes.guangdong=rma(yi,vi,data=ies.all,subset=province=="Guangdong",method="DL")
-pes.guangxi=rma(yi,vi,data=ies.all,subset=province=="Guangxi",method="DL")
-print(pes.all,digits=3)
+```{r Calculate overall and subgroup effect sizes}
+ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
+pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
+pes.guangdong=rma(yi,vi,data=ies,subset=province=="Guangdong",method="DL")
+pes.guangxi=rma(yi,vi,data=ies,subset=province=="Guangxi",method="DL")
+print(pes,digits=3)
 print(pes.guangdong,digits=3)
 print(pes.guangxi,digits=3)
 ```
-```{r forest plot using raw proportions }
-dat=subset(dat, province %in% c("Guangdong","Guangxi"))#extract two Guangs
-ies.guangs=escalc(xi=cases,ni=total,measure="PR",data=dat)
-pes.guangs=rma(yi,vi,data=ies.guangs,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
-forest(pes.guangs,
-       ylim=c(-2,30),#vertical limits
-       xlim=c(-2,2.1),#horizontal limits
-       rows=c(25:13,7.6:2.6),#1 is the row above the line below;ylim and rows both determine the position of studies
-       main="Effect size by province (RE Model)",
-       ilab=cbind(data=dat$cases, dat$total),#show cases and total
-       ilab.xpos=c(-0.8, -0.4),#position of cases and total
-       refline=pes.guangs$b,#reference line position
-       at=c(seq(from=0,to=1.1,by=0.2)), #legendary lenghth
-       xlab="Proportion",#legendary lable
-       mlab="",
-       cex=0.8,#overall size
-       font=6,
-       digits=3
-       )
-#Add lables
-text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")#-2=x,17=y;font=2=bold
-text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))#use c() to posit subgroup lables
-text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
-text(1.3,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
-#Add heterogeneity stats
-#Two provinces
-text(-2,-1.1,pos=4,cex=0.7,font=1,
-     bquote(paste("All studies(Q = ",.(formatC(pes.guangs$QE, digits=1, format="f")), ", df = ", .(pes.guangs$k - pes.guangs$p),", p = ", .(formatC(pes.guangs$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.guangs$I2, digits=1, format="f")), "%",")")))
-#Guangdong
-text(-2,11.4,pos=4,cex=0.7,font=1,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.guangdong$QE, digits=1, format="f")), ", df = ", .(pes.guangdong$k - pes.guangdong$p),", p = ", .(formatC(pes.guangdong$QEp, digits=2, format="f")),
-     "; ", I^2, " = ",.(formatC(pes.guangdong$I2, digits=1, format="f")), "%",")")))
-#Guangxi
-text(-2,1.1,pos=4,cex=0.7,font=3,
-     bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p), 
-     ", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")), 
-     "; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
-#Add summary polygons for subgroups
-#Guangdong
-addpoly(pes.guangdong,
-        row=11.4,#position
-        cex=0.7,font=1,#font size and bold
-        mlab="",
-        digits=3)
-#Guangxi
-addpoly(pes.guangxi, 
-        row=1.1, 
-        cex=0.7, font=1,
-        mlab="",  
-        digits=3)
-dev.copy(png,'Effect size by province.png')
+```{r Forest plot using metaprop}
+#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
+pes.forest=metaprop(cases,total,author,data=dat,byvar=province,sm="PRAW",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_meta.png",width=1000,height=1000)
+forest(pes.forest,
+       xlim = c(0,1), pscale =1, 
+       rightcols=c("effect", "ci","w.random"),
+       rightlabs=c("Proportion", "95% C.I.","Weights"),
+       leftcols = c("studlab", "event", "n"), 
+       leftlabs = c("Study", "Cases", "Total"),
+       xlab = "Prevalence", 
+       fs.xlab=12,
+       fs.study=12,
+       fs.study.lables=12,
+       fs.heading=12,
+       squaresize = 0.5, col.square="navy", col.square.lines="navy",
+       col.diamond="navy", col.diamond.lines="navy",
+       comb.fixed=FALSE,
+       lty.fixed=0,
+       lty.random=2, 
+       type.study="square",
+       type.random="diamond",
+       ff.fixed="bold.italic",
+       ff.random="bold.italic",
+       hetlab = "Heterogeneity:",
+       fs.hetstat=10,
+       smlab="",
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       print.tau2=FALSE,
+       col.by="grey")
 dev.off()
 ```
-```{r check evidence of heterogeneity}
-print(pes.guangs,digits=2)
+```{r Forest plot using metaprop}
+#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
+png("forestplot_metafor.png",width=1000,height=1000)
+forest(pes,
+       ilab=cbind(data=dat$cases, dat$total),
+       ilab.xpos=c(-0.8, -0.4),
+       rows=c(25:13,7.6:2.6),
+       at=c(seq(from=0,to=1.1,by=0.2)), 
+       refline=pes$b,
+       ylim=c(-2,30),
+       xlim=c(-2,2.1),
+       cex=0.8,
+       font=6,
+       main="Effect size by province (RE Model)",
+       xlab="Proportion",
+       digits=3
+       )
+text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")
+text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))
+text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
+text(1.65,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
+text(-2,-1.1,pos=4,cex=0.8,font=1,bquote(paste("All studies(Q = ",.(formatC(pes$QE, digits=1, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes$I2, digits=1, format="f")), "%",")")))
+text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangdong$QE, digits=1, format="f")), ", df = ", .(pes.guangdong$k - pes.guangdong$p),", p = ", .(formatC(pes.guangdong$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangdong$I2, digits=1, format="f")), "%",")")))
+text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p),", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
+addpoly(pes.guangdong,row=11.4,cex=0.8,font=1,mlab="",digits=3)
+addpoly(pes.guangxi,row=1.1,cex=0.8, font=1,mlab="",digits=3)
+dev.off()
 ```
-```{r baujat plot}
-baujat(pes.guangs)
+```{r Baujat plot}
+baujat(pes)
 ```
-```{r A set of diagnostics to id potential outliers and influential cases}
-pes.inf=influence(pes.guangs)
-plot(pes.inf)
+```{r Diagnostic tests with logit transformation}
+inf=influence(pes)
+plot(inf)
 ```
-```{r leave one out analysis}
-leave1out(pes.guangs)
+```{r Leave-one-out analysis}
+leave1out(pes)
 ```
-```{r subgroup analysis without transformation}
-#assume a common variance
-subganal.guangs=rma(yi,vi,data=ies.guangs,mods=~province,method="DL")
+```{r Subgroup analysis}
+#If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
+subganal.guangs=rma(yi,vi,data=ies,mods=~province,method="DL")
 print(subganal.guangs)
-#do not assume a common variance (metaprop mode)
+#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
 #dat.diffvar= data.frame(estimate=c(pes.guangdong$b, pes.guangxi$b),stderror=c(pes.guangdong$se, pes.guangxi$se),province = c("Guangdong","Guangxi"), tau2=round(c(pes.guangdong$tau2, pes.guangxi$tau2),3))
 #subganal.guangs=rma(estimate, sei=stderror, mods = ~ province, method="FE", data=dat.diffvar, digits=4)
 #print(subganal.guangs,digits=3)
 ```
-```{r funnel plot with raw proportions}
-funnel(pes.guangs)
+```{r Funnel plot}
+png("funnel.png",width=1000,height=1000)
+funnel(pes)
+dev.off()
 ```
-```{r trim and fill with raw proportions}
-pes.trimfill=trimfill(pes.guangs)
+```{r Trim and fill plot}
+png("trimfill.png",width=1000,height=1000)
+pes.trimfill=trimfill(pes)
 funnel(pes.trimfill)
+dev.off()
 print(pes.trimfill,digits=2)
 ```
-```{r Egger's regression test with raw proportions}
-regtest(pes.guangs,model="lm",predictor="sei")
+```{r Egger's regression test}
+regtest(pes,model="lm",predictor="sei")
 ```
-```{r rank correlation (Kendall's tall) with raw proporitons}
-ranktest(pes.guangs)
+```{r Rank correlation}
+ranktest(pes)
 ```
-```{r Vevea and Hedges (1995) Weight-Function Model}
-weightfunct(ies.guangs$yi,ies.guangs$vi,steps=0.05) 
+```{r Vevea and Hedges Weight-Function Model with logit transformation}
+weightfunct(ies$yi,ies$vi,steps=0.05) 
 ```
 

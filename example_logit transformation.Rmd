@@ -77,7 +77,8 @@ forest(ies.summary$yi,
        font=6,
        main="Effect size by study type (RE Model)",
        xlab="Proportion",
-       digits=5)
+       digits=5
+       )
 text(-0.005, 23,pos=4,cex=1,font=6,"Author(s), Year")
 text(-0.005,c(10,20.5),pos=4, cex=1,font=6,c("Others", "Birth Cohort"))
 text(c(-0.0022,-0.0012), 23,pos=4,cex=1,font=6,c("Cases", "Total"))
