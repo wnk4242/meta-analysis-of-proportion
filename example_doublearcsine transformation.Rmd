@@ -141,8 +141,8 @@ regtest(pes.ft,model="lm",predictor="sei")
 ```{r Rank correlation with double arcsine transformation}
 ranktest(pes.ft)
 ```
-```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
-weightfunct(ies.ft$yi,ies.ft$vi,steps=0.05)
+```{r Failsafe N test with double arcsine transformation}
+fsn(yi,vi,data=ies.ft)
 ```
 
 
