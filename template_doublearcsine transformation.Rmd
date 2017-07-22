@@ -1,7 +1,7 @@
 ```{r Install required packages}
-#install.packages('metafor')
-#install.packages('meta')
-#install.packages('weightr')
+install.packages('metafor')
+install.packages('meta')
+install.packages('weightr')
 ```
 ```{r Load required packages}
 library(metafor)
@@ -118,18 +118,19 @@ print(subganal.moderatora)
 #print(subganal.moderatora)
 ```
 ```{r Meta-regression with double arcsine transformation}
-mreg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
-print(mreg.mod1)
+metareg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+print(metareg.mod1)
 ```
 ```{r Bubble plot with double arcsine transformed data}
+#Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
 wi=1/sqrt(ies.ft$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes.bb=predict(mreg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.bb=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
 plot(ies.ft$moderator1,transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
 lines(0:40,pes.bb$pred)
 lines(0:40,pes.bb$ci.lb,lty="dashed")
 lines(0:40,pes.bb$ci.ub,lty="dashed")
-ids <- c(1,2)
+ids <- c(1:6)
 pos <- c(3)
 text(ies.ft$moderator1[ids], transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```

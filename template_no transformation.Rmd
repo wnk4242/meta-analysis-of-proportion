@@ -1,7 +1,7 @@
 ```{r Install required packages}
-#install.packages('metafor')
-#install.packages('meta')
-#install.packages('weightr')
+install.packages('metafor')
+install.packages('meta')
+install.packages('weightr')
 ```
 ```{r Load required packages}
 library(metafor)
@@ -102,14 +102,15 @@ print(subganal.moderatora)
 #print(subganal.moderatora)
 ```
 ```{r Meta-regression}
-mreg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
-print(mreg.mod1)
+metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
+print(metareg.mod1)
 ```
 ```{r Bubble plot}
+#Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes.bb=predict(mreg.mod1,newmods=c(0:40),transf=transf.ilogit)
-plot(ies$moderator1,transf.ilogit(ies$yi),cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
+pes.bb=predict(metareg.mod1,newmods=c(0:40))
+plot(ies$moderator1,ies$yi,cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
 lines(0:40,pes.bb$pred)
 lines(0:40,pes.bb$ci.lb,lty="dashed")
 lines(0:40,pes.bb$ci.ub,lty="dashed")
