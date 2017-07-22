@@ -9,7 +9,7 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("D:/mygithubproj/metaprops")
+setwd("D:/mygithubproj/metaprops/data")
 dat=read.csv("ammirati.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}

@@ -9,7 +9,7 @@ library(meta)
 library(weightr)
 ```
 ```{r read data files}
-setwd("D:/mygithubproj/metaprops")
+setwd("D:/mygithubproj/metaprops/data")
 dat=read.csv("wu.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with logit transformation}
