@@ -68,17 +68,17 @@ print(pes.mal1)
 print(pes.mal2)
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
-#这个chunk里的语句首先会对数据进行double arcsine转换。escalc()命令是对数据进行double arcsine转换，可得到每一个研究经过double arcsine公式转换后的效应量,ies.ft是individual effect size.freeman-tukey的意思。
-#rma()就是把上面单个研究的效应量合并，此时得到的合并效应量仍然是经过double arcsine公式转换后的效应量（即，单位并不是率），pes.ft是pooled effect size.freeman-tukey的意思;此处的method=""是让用户选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
-#pes.ft.mal1和pes.ft.mal2是计算每个亚组的平均效应量。mal1和mal2即moderatoralevel1和moderatoralevel2。
+#这个chunk里的语句首先会对数据进行double arcsine转换。escalc()命令是对数据进行double arcsine转换，可得到每一个研究经过double arcsine公式转换后的效应量,ies.da是individual effect size.freeman-tukey的意思。
+#rma()就是把上面单个研究的效应量合并，此时得到的合并效应量仍然是经过double arcsine公式转换后的效应量（即，单位并不是率），pes.da是pooled effect size.freeman-tukey的意思;此处的method=""是让用户选择使用固定效应模型（Fixed Effect model，命令代码为FE）,还是随机效应模型，包括DerSimonian-Laird estimator（DL）， restricted maximum-likelihood estimator（REML）以及maximum-likelihood estimator（ML）。
+#pes.da.mal1和pes.da.mal2是计算每个亚组的平均效应量。mal1和mal2即moderatoralevel1和moderatoralevel2。
 #pes是pooled effect size，这是最终结果，以率为单位表示的所有研究的平均效应量。predict()中的transf=transf.ipft.hm,targ=list(ni=dat$total)是把经过double arcsine转换的数据再转换回来的语句，就是再次以率的形式表示（原数据就是事件数除以总人数=率）。
-ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
-pes.ft=rma(yi,vi,data=ies.ft,method="DL",weighted=TRUE)
-pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="DL")
-pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="DL")
-pes=predict(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.mal1=predict(pes.ft.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.mal2=predict(pes.ft.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
+ies.da=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
+pes.da=rma(yi,vi,data=ies.da,method="DL",weighted=TRUE)
+pes.da.mal1=rma(yi,vi,data=ies.da,subset=moderatora=="level1",method="DL")
+pes.da.mal2=rma(yi,vi,data=ies.da,subset=moderatora=="level2",method="DL")
+pes=predict(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal1=predict(pes.da.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal2=predict(pes.da.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes)
 print(pes.mal1)
 print(pes.mal2)
@@ -105,7 +105,7 @@ dev.off()
 #同上
 #sm=""是选择数据转换方法；这里，PFT是进行double arcsine转换
 pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot_ft.png",width=1000,height=1000)
+png("forestplot_da.png",width=1000,height=1000)
 forest(pes.forest)
 dev.off()
 ```
@@ -123,9 +123,9 @@ print(pes.logit.mal2)
 ```
 ```{r Heterogeneity test with double arcsine transformation}
 #同上
-print(pes.ft)
-print(pes.ft.mal1)
-print(pes.ft.mal2)
+print(pes.da)
+print(pes.da.mal1)
+print(pes.da.mal2)
 ```
 ```{r Baujat plot with no data transformation}
 #检验异常值的图
@@ -137,7 +137,7 @@ baujat(pes.logit)
 ```
 ```{r Baujat plot with double arcsine transformation}
 #同上
-baujat(pes.ft)
+baujat(pes.da)
 ```
 ```{r Diagnostic tests with no data transformation}
 #检验异常值的图
@@ -153,7 +153,7 @@ plot(inf)
 ```
 ```{r Diagnostic tests with double arcsine transformation}
 #同上
-inf=influence(pes.ft)
+inf=influence(pes.da)
 print(inf)
 plot(inf)
 ```
@@ -168,7 +168,7 @@ print(pes.leave1out)
 ```
 ```{r Leave-one-out analysis with double artcsine transformation}
 #同上
-pes.leave1out=leave1out(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.leave1out=leave1out(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.leave1out)
 ```
 ```{r Subgroup analysis with no data transformation}
@@ -183,7 +183,7 @@ print(subganal.moderatora)
 ```
 ```{r Subgroup analysis with double arcsine transformation}
 #同上
-subganal.moderatora=rma(yi,vi, data=ies.ft, mods=~moderatora, method="DL")
+subganal.moderatora=rma(yi,vi, data=ies.da, mods=~moderatora, method="DL")
 print(subganal.moderatora)
 ```
 ```{r Meta-regression with no data transformation}
@@ -199,7 +199,7 @@ print(mreg.mod1)
 ```
 ```{r Meta-regression with double arcsine transformation}
 #同上
-mreg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+mreg.mod1=rma(yi,vi,data=ies.da,mods=~moderator1,method="REML",test="z")
 print(mreg.mod1)
 ```
 ```{r Funnel plot with no data transformation}
@@ -216,8 +216,8 @@ dev.off()
 ```
 ```{r Funnel plot with double arcsine transformation}
 #同上
-png("funnel_ft.png",width=1000,height=1000)
-funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+png("funnel_da.png",width=1000,height=1000)
+funnel(pes.da,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
 dev.off()
 ```
 ```{r Trim and fill plot with no data transformation}
@@ -236,8 +236,8 @@ dev.off()
 ```
 ```{r Trim and fill plot with double arcsine transformation}
 #同上
-pes.trimfill=trimfill(pes.ft)
-png("trimfill_ft.png",width=1000,height=1000)
+pes.trimfill=trimfill(pes.da)
+png("trimfill_da.png",width=1000,height=1000)
 funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
 dev.off()
 ```
@@ -251,7 +251,7 @@ regtest(pes.logit,model="lm",predictor="sei")
 ```
 ```{r Egger's regression test with double arcsine transformation}
 #同上
-regtest(pes.ft,model="lm",predictor="sei")
+regtest(pes.da,model="lm",predictor="sei")
 ```
 ```{r Rank correlation with no transformation}
 #检验发表偏倚的Rank correlation test。
@@ -263,7 +263,7 @@ ranktest(pes.logit)
 ```
 ```{r Rank correlation with double arcsine transformation}
 #同上
-ranktest(pes.ft)
+ranktest(pes.da)
 ```
 ```{r Vevea and Hedges Weight-Function Model with no transformation}
 #检验发表偏倚的一种检测。
@@ -276,5 +276,5 @@ weightfunct(ies.logit$yi,ies.logit$vi,steps=0.05)
 ```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
 #同上
 #用weightfunct()对ammarati那个数据进行分析，无法得到结果，这不是语句的问题，是数据本身性质的问题。
-weightfunct(ies.ft$yi,ies.ft$vi,steps=0.05)
+weightfunct(ies.da$yi,ies.da$vi,steps=0.05)
 ```
