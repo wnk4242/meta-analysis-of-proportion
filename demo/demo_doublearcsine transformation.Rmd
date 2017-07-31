@@ -29,7 +29,7 @@ print(pes.microscopy,digits=4)
 ```
 ```{r Forest plot with double arcsine transformation using metaprop}
 pes.forest=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot_ft_meta.png",width=1000,height=1000)
+png("forestplot.png",width=1000,height=1000)
 forest(pes.forest,
        xlim = c(0,0.5), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
@@ -63,7 +63,7 @@ forest(pes.forest,
 dev.off()
 ```
 ```{r Forest plot with double arcsine transformation using metafor}
-png("forestplot_ft_metafor.png",width=1000,height=1000)
+png("forestplot.png",width=1000,height=1000)
 ies.summary=summary(ies.da,transf=transf.ipft,ni=dat$total)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
@@ -117,7 +117,7 @@ print(subganal.procedure)
 #print(subganal.procedure,digits=3)
 ```
 ```{r Funnel plot with double arcsine transformation}
-png("funnel_ft.png",width=1000,height=1000)
+png("funnel.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.da,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
@@ -126,7 +126,7 @@ dev.off()
 ```
 ```{r Trim and fill plot with double arcsine transformation}
 pes.trimfill=trimfill(pes.da)
-png("trimfill_ft.png",width=1000,height=1000)
+png("trimfill.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.trimfill)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.

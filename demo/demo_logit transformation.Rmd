@@ -27,7 +27,7 @@ print(pes.others,digits=6)
 ```{r Forest plot with logit transformation using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
 pes.forest=metaprop(cases,total,author,data=dat,byvar=studytype,sm="PLO",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot_meta_wu.png",width=1000,height=1000)
+png("forestplot.png",width=1000,height=1000)
 forest(pes.forest,
        xlim = c(0,0.005), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
@@ -61,7 +61,7 @@ dev.off()
 ```
 ```{r Forest plot with logit transformation using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-png("forestplot_metafor_wu.png",width=1000,height=1000)
+png("forestplot.png",width=1000,height=1000)
 ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
@@ -119,7 +119,7 @@ subganal.studytype=rma(estimate, sei=stderror, mods = ~ studytype, method="FE", 
 print(subganal.studytype,digits=3)
 ```
 ```{r Funnel plot with logit transformation}
-png("funnel_wu.png",width=1000,height=1000)
+png("funnel.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.logit,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
@@ -128,7 +128,7 @@ dev.off()
 ```
 ```{r Trim and fill plot with logit transformation}
 pes.trimfill=trimfill(pes.logit)
-png("trimfill_wu.png",width=1000,height=1000)
+png("trimfill.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.trimfill)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
