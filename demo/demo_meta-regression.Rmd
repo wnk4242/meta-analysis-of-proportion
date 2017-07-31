@@ -64,21 +64,21 @@ pos <- c(1)
 text(ies.logit$moderator1[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Calculate individual effect sizes with Freeman-Tukey double arcsine transformation}
-ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
+ies.da=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
 ```
 ```{r Meta-regression with double arcsine transformation}
-metareg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+metareg.mod1=rma(yi,vi,data=ies.da,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
 ```{r Bubble plot with double arcsine transformed data}
-wi=1/sqrt(ies.ft$vi)
+wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes.ft=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
-plot(ies.ft$moderator1,transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total)),cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
-lines(0:40,pes.ft$pred)
-lines(0:40,pes.ft$ci.lb,lty="dashed")
-lines(0:40,pes.ft$ci.ub,lty="dashed")
+pes.da=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
+plot(ies.da$moderator1,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
+lines(0:40,pes.da$pred)
+lines(0:40,pes.da$ci.lb,lty="dashed")
+lines(0:40,pes.da$ci.ub,lty="dashed")
 ids <- c(1:6)
 pos <- c(3)
-text(ies.ft$moderator1[ids], transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies.da$moderator1[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```
