@@ -13,7 +13,7 @@ setwd("D:/mygithubproj/metaprops/data")
 dat=read.csv("ammirati.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
-ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
+ies.ft=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
 pes.ft=rma(yi,vi,data=ies.ft,method="FE",weighted=TRUE)
 pes.ft.endoscopy=rma(yi,vi,data=ies.ft,subset=procedure=="endoscopy",method="FE")
 pes.ft.microscopy=rma(yi,vi,data=ies.ft,subset=procedure=="microscopy",method="FE")
