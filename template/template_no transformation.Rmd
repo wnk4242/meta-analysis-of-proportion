@@ -72,7 +72,7 @@ forest(pes,
        xlab="Proportion"
        )
 text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")
-text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("level2", "level1")) 
+text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("mal2", "mal1")) 
 text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
 text(1.65,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
 text(-2,-1.1,pos=4,cex=0.8,font=1, bquote(paste("All studies(Q = ",.(formatC(pes$QE, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes$I2, format="f")), "%",")")))
@@ -97,7 +97,7 @@ leave1out(pes)
 subganal.moderatora=rma(yi,vi,data=ies,mods=~moderatora,method="DL")
 print(subganal.moderatora)
 #If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-#dat.diffvar= data.frame(estimate=c(pes.mal1$b, pes.mal2$b),stderror=c(pes.mal1$se, pes.mal2$se),moderatora = c("level1","level2"), tau2=round(c(pes.mal1$tau2, pes.mal2$tau2),3))
+#dat.diffvar= data.frame(estimate=c(pes.mal1$b, pes.mal2$b),stderror=c(pes.mal1$se, pes.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.mal1$tau2, pes.mal2$tau2),3))
 #subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
 #print(subganal.moderatora)
 ```

@@ -13,7 +13,7 @@ setwd("your working directory")
 dat=read.csv("1stauthorpubyear.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
-ies.ft=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
+ies.ft=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
 pes.ft=rma(yi,vi,data=ies.ft,method="DL",weighted=TRUE) 
 pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="DL")
 pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="DL")
