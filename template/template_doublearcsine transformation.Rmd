@@ -78,7 +78,7 @@ forest(ies.summary$yi,
        xlab="Proportion"
        )
 text(-2, 41,pos=4,cex=1,font=6,"Author(s), Year")
-text(-2,c(14.5,37.5),pos=4, cex=1,font=6,c("level2", "level1"))
+text(-2,c(14.5,37.5),pos=4, cex=1,font=6,c("mal2", "mal1"))
 text(c(-0.9,-0.6), 41,pos=4,cex=1,font=6,c("Cases", "Total"))
 text(1.6,41,pos=4,font=6,cex=1,"Proportion [95% CI]")
 addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=18.5,cex=0.8,mlab="")
@@ -113,7 +113,7 @@ print(pes.leave1out)
 subganal.moderatora=rma(yi,vi, data=ies.ft, mods = ~ moderatora, method="DL")
 print(subganal.moderatora)
 #If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-#dat.diffvar= data.frame(estimate=c(pes.ft.mal1$b, pes.ft.mal2$b),stderror=c(pes.ft.mal1$se, pes.ft.mal2$se),moderatora = c("level1","level2"), tau2=round(c(pes.ft.mal1$tau2, pes.ft.mal2$tau2),3))
+#dat.diffvar= data.frame(estimate=c(pes.ft.mal1$b, pes.ft.mal2$b),stderror=c(pes.ft.mal1$se, pes.ft.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.ft.mal1$tau2, pes.ft.mal2$tau2),3))
 #subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
 #print(subganal.moderatora)
 ```
