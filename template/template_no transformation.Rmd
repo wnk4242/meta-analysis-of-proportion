@@ -136,7 +136,10 @@ regtest(pes,model="lm",predictor="sei")
 ```{r Rank correlation}
 ranktest(pes)
 ```
-```{r Vevea and Hedges Weight-Function Model with logit transformation}
+```{r Failsafe N test}
+fsn(yi,vi,data=ies)
+```
+```{r Vevea and Hedges Weight-Function Model}
 weightfunct(ies$yi,ies$vi,steps=0.05) 
 ```
 

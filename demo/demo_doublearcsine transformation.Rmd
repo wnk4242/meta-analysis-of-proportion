@@ -13,16 +13,16 @@ setwd("D:/mygithubproj/metaprops/data")
 dat=read.csv("ammirati.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
-ies.ft=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
-pes.ft=rma(yi,vi,data=ies.ft,method="FE",weighted=TRUE)
-pes.ft.endoscopy=rma(yi,vi,data=ies.ft,subset=procedure=="endoscopy",method="FE")
-pes.ft.microscopy=rma(yi,vi,data=ies.ft,subset=procedure=="microscopy",method="FE")
-pes=predict(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.endoscopy=predict(pes.ft.endoscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.microscopy=predict(pes.ft.microscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
-##pes=predict(pes.ft,transf=transf.iarcsin)
-##pes.endoscopy=predict(pes.ft.endoscopy,transf=transf.iarcsin)
-##pes.microscopy=predict(pes.ft.microscopy,transf=transf.iarcsin)
+ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
+pes.da=rma(yi,vi,data=ies.da,method="FE",weighted=TRUE)
+pes.da.endoscopy=rma(yi,vi,data=ies.da,subset=procedure=="endoscopy",method="FE")
+pes.da.microscopy=rma(yi,vi,data=ies.da,subset=procedure=="microscopy",method="FE")
+pes=predict(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.endoscopy=predict(pes.da.endoscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.microscopy=predict(pes.da.microscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
+##pes=predict(pes.da,transf=transf.iarcsin)
+##pes.endoscopy=predict(pes.da.endoscopy,transf=transf.iarcsin)
+##pes.microscopy=predict(pes.da.microscopy,transf=transf.iarcsin)
 print(pes,digits=4)
 print(pes.endoscopy,digits=4)
 print(pes.microscopy,digits=4)
@@ -64,7 +64,7 @@ dev.off()
 ```
 ```{r Forest plot with double arcsine transformation using metafor}
 png("forestplot_ft_metafor.png",width=1000,height=1000)
-ies.summary=summary(ies.ft,transf=transf.ipft,ni=dat$total)
+ies.summary=summary(ies.da,transf=transf.ipft,ni=dat$total)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
        slab=paste(dat$author, dat$year, sep=", "),
@@ -87,45 +87,45 @@ text(1.6,41,pos=4,font=6,cex=1,"Proportion [95% CI]")
 addpoly(pes.endoscopy$pred,ci.lb=pes.endoscopy$ci.lb,ci.ub=pes.endoscopy$ci.ub,row=18.5,digits=4,cex=0.8,mlab="")
 addpoly(pes.microscopy$pred,ci.lb=pes.microscopy$ci.lb,ci.ub=pes.microscopy$ci.ub,row=0.5,digits=4,cex=0.8,mlab="")
 addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-3,digits=4,cex=0.8,mlab="")
-text(-2,-3,pos=4,cex=0.8,bquote(paste("All studies (Q = ",.(formatC(pes.ft$QE, digits=1, format="f")), ", df = ", .(pes.ft$k - pes.ft$p),", p = ", .(formatC(pes.ft$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.ft$I2, digits=1, format="f")), "%",")")))
-text(-2,18.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.ft.endoscopy$QE, digits=1, format="f")), ", df = ", .(pes.ft.endoscopy$k - pes.ft.endoscopy$p),", p = ", .(formatC(pes.ft.endoscopy$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.ft.endoscopy$I2, digits=1, format="f")), "%",")")))
-text(-2,0.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.ft.microscopy$QE, digits=1, format="f")),", df = ", .(pes.ft.microscopy$k - pes.ft.microscopy$p), ", p = ", .(formatC(pes.ft.microscopy$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.ft.microscopy$I2, digits=1, format="f")), "%",")")))
+text(-2,-3,pos=4,cex=0.8,bquote(paste("All studies (Q = ",.(formatC(pes.da$QE, digits=1, format="f")), ", df = ", .(pes.da$k - pes.da$p),", p = ", .(formatC(pes.da$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.da$I2, digits=1, format="f")), "%",")")))
+text(-2,18.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.da.endoscopy$QE, digits=1, format="f")), ", df = ", .(pes.da.endoscopy$k - pes.da.endoscopy$p),", p = ", .(formatC(pes.da.endoscopy$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.da.endoscopy$I2, digits=1, format="f")), "%",")")))
+text(-2,0.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.da.microscopy$QE, digits=1, format="f")),", df = ", .(pes.da.microscopy$k - pes.da.microscopy$p), ", p = ", .(formatC(pes.da.microscopy$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.da.microscopy$I2, digits=1, format="f")), "%",")")))
 abline(h=-2)
 ```
 ```{r Heterogeneity test with double arcsine transformation}
-print(pes.ft,digits=2)
-print(pes.ft.endoscopy,digits=2)
-print(pes.ft.microscopy,digits=2)
+print(pes.da,digits=2)
+print(pes.da.endoscopy,digits=2)
+print(pes.da.microscopy,digits=2)
 ```
 ```{r Baujat plot with double arcsine transformation}
-baujat(pes.ft)
+baujat(pes.da)
 ```
 ```{r Diagnostic tests with double arcsine transformation}
-inf=influence(pes.ft)
+inf=influence(pes.da)
 print(inf,digits=2)
 plot(inf)
 ```
 ```{r Leave-one-out analysis with double artcsine transformation}
-pes.leave1out=leave1out(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total),digits=4)
+pes.leave1out=leave1out(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total),digits=4)
 print(pes.leave1out)
 ```
 ```{r Subgroup analysis with double arcsine transformation}
-subganal.procedure=rma(yi,vi, data=ies.ft, mods = ~ procedure, method="FE")
+subganal.procedure=rma(yi,vi, data=ies.da, mods = ~ procedure, method="FE")
 print(subganal.procedure)
-#dat.diffvar= data.frame(estimate=c(pes.ft.endoscopy$b, pes.ft.microscopy$b),stderror=c(pes.ft.endoscopy$se, pes.ft.microscopy$se),procedure = c("endoscopy","microscopy"), tau2=round(c(pes.ft.endoscopy$tau2, pes.ft.microscopy$tau2),3))
+#dat.diffvar= data.frame(estimate=c(pes.da.endoscopy$b, pes.da.microscopy$b),stderror=c(pes.da.endoscopy$se, pes.da.microscopy$se),procedure = c("endoscopy","microscopy"), tau2=round(c(pes.da.endoscopy$tau2, pes.da.microscopy$tau2),3))
 #subganal.procedure=rma(estimate, sei=stderror, mods = ~ procedure, method="FE", data=dat.diffvar, digits=4)
 #print(subganal.procedure,digits=3)
 ```
 ```{r Funnel plot with double arcsine transformation}
 png("funnel_ft.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
-#funnel(pes.ft,yaxis="sei")
+#funnel(pes.da,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+funnel(pes.da,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
 dev.off()
 ```
 ```{r Trim and fill plot with double arcsine transformation}
-pes.trimfill=trimfill(pes.ft)
+pes.trimfill=trimfill(pes.da)
 png("trimfill_ft.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.trimfill)
@@ -136,16 +136,16 @@ pes.adjusted=predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.adjusted,digits=4)
 ```
 ```{r Egger's regression test with double arcsine transformation}
-regtest(pes.ft,model="lm",predictor="sei")
+regtest(pes.da,model="lm",predictor="sei")
 ```
 ```{r Rank correlation with double arcsine transformation}
-ranktest(pes.ft)
+ranktest(pes.da)
 ```
 ```{r Failsafe N test with double arcsine transformation}
-fsn(yi,vi,data=ies.ft)
+fsn(yi,vi,data=ies.da)
 ```
 ```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
-weightfunct(ies.ft$yi,ies.ft$vi,steps=0.05)
+weightfunct(ies.da$yi,ies.da$vi,steps=0.05)
 ```
 
 

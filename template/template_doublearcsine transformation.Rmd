@@ -13,13 +13,13 @@ setwd("your working directory")
 dat=read.csv("1stauthorpubyear.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
-ies.ft=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
-pes.ft=rma(yi,vi,data=ies.ft,method="DL",weighted=TRUE) 
-pes.ft.mal1=rma(yi,vi,data=ies.ft,subset=moderatora=="level1",method="DL")
-pes.ft.mal2=rma(yi,vi,data=ies.ft,subset=moderatora=="level2",method="DL")
-pes=predict(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.mal1=predict(pes.ft.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.mal2=predict(pes.ft.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
+ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
+pes.da=rma(yi,vi,data=ies.da,method="DL",weighted=TRUE) 
+pes.da.mal1=rma(yi,vi,data=ies.da,subset=moderatora=="level1",method="DL")
+pes.da.mal2=rma(yi,vi,data=ies.da,subset=moderatora=="level2",method="DL")
+pes=predict(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal1=predict(pes.da.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.mal2=predict(pes.da.mal2,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes)
 print(pes.mal1)
 print(pes.mal2)
@@ -61,7 +61,7 @@ dev.off()
 ```{r Forest plot with double arcsine transformation using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
 png("forestplot_ft_metafor.png",width=1000,height=1000)
-ies.summary=summary(ies.ft,transf=transf.ipft,ni=dat$total)
+ies.summary=summary(ies.da,transf=transf.ipft,ni=dat$total)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
        slab=paste(dat$author, dat$year, sep=", "),
@@ -84,66 +84,66 @@ text(1.6,41,pos=4,font=6,cex=1,"Proportion [95% CI]")
 addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=18.5,cex=0.8,mlab="")
 addpoly(pes.mal2$pred,ci.lb=pes.mal2$ci.lb,ci.ub=pes.mal2$ci.ub,row=0.5,cex=0.8,mlab="")
 addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-3,cex=0.8,mlab="")
-text(-2,-3,pos=4,cex=0.8, bquote(paste("All studies (Q = ",.(formatC(pes.ft$QE, format="f")), ", df = ", .(pes.ft$k - pes.ft$p),", p = ", .(formatC(pes.ft$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.ft$I2, format="f")), "%",")")))
-text(-2,18.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.ft.mal1$QE, format="f")), ", df = ", .(pes.ft.mal1$k - pes.ft.mal1$p),", p = ", .(formatC(pes.ft.mal1$QEp, format="f")),
-"; ", I^2, " = ",.(formatC(pes.ft.mal1$I2, format="f")), "%",")")))
-text(-2,0.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.ft.mal2$QE, format="f")),", df = ", .(pes.ft.mal2$k - pes.ft.mal2$p), ", p = ", .(formatC(pes.ft.mal2$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.ft.mal2$I2, format="f")), "%",")")))
+text(-2,-3,pos=4,cex=0.8, bquote(paste("All studies (Q = ",.(formatC(pes.da$QE, format="f")), ", df = ", .(pes.da$k - pes.da$p),", p = ", .(formatC(pes.da$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.da$I2, format="f")), "%",")")))
+text(-2,18.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.da.mal1$QE, format="f")), ", df = ", .(pes.da.mal1$k - pes.da.mal1$p),", p = ", .(formatC(pes.da.mal1$QEp, format="f")),
+"; ", I^2, " = ",.(formatC(pes.da.mal1$I2, format="f")), "%",")")))
+text(-2,0.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.da.mal2$QE, format="f")),", df = ", .(pes.da.mal2$k - pes.da.mal2$p), ", p = ", .(formatC(pes.da.mal2$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.da.mal2$I2, format="f")), "%",")")))
 abline(h=-2)
 dev.off()
 ```
 ```{r Heterogeneity test with double arcsine transformation}
-print(pes.ft)
-print(pes.ft.mal1)
-print(pes.ft.mal2)
+print(pes.da)
+print(pes.da.mal1)
+print(pes.da.mal2)
 ```
 ```{r Baujat plot with double arcsine transformation}
-baujat(pes.ft)
+baujat(pes.da)
 ```
 ```{r Diagnostic tests with double arcsine transformation}
-inf=influence(pes.ft)
+inf=influence(pes.da)
 print(inf)
 plot(inf)
 ```
 ```{r Leave-one-out analysis with double artcsine transformation}
-pes.leave1out=leave1out(pes.ft,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.leave1out=leave1out(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.leave1out)
 ```
 ```{r Subgroup analysis with double arcsine transformation}
 #If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
-subganal.moderatora=rma(yi,vi, data=ies.ft, mods = ~ moderatora, method="DL")
+subganal.moderatora=rma(yi,vi, data=ies.da, mods = ~ moderatora, method="DL")
 print(subganal.moderatora)
 #If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-#dat.diffvar= data.frame(estimate=c(pes.ft.mal1$b, pes.ft.mal2$b),stderror=c(pes.ft.mal1$se, pes.ft.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.ft.mal1$tau2, pes.ft.mal2$tau2),3))
+#dat.diffvar= data.frame(estimate=c(pes.da.mal1$b, pes.da.mal2$b),stderror=c(pes.da.mal1$se, pes.da.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.da.mal1$tau2, pes.da.mal2$tau2),3))
 #subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
 #print(subganal.moderatora)
 ```
 ```{r Meta-regression with double arcsine transformation}
-metareg.mod1=rma(yi,vi,data=ies.ft,mods=~moderator1,method="REML",test="z")
+metareg.mod1=rma(yi,vi,data=ies.da,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
 ```{r Bubble plot with double arcsine transformed data}
 #Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-wi=1/sqrt(ies.ft$vi)
+wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
 pes.bb=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
-plot(ies.ft$moderator1,transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
+plot(ies.da$moderator1,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
 lines(0:40,pes.bb$pred)
 lines(0:40,pes.bb$ci.lb,lty="dashed")
 lines(0:40,pes.bb$ci.ub,lty="dashed")
 ids <- c(1:6)
 pos <- c(3)
-text(ies.ft$moderator1[ids], transf.ipft.hm(ies.ft$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies.da$moderator1[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Funnel plot with double arcsine transformation}
 png("funnel_ft.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
-#funnel(pes.ft,yaxis="sei")
+#funnel(pes.da,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-funnel(pes.ft,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
+funnel(pes.da,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
 dev.off()
 ```
 ```{r Trim and fill plot with double arcsine transformation}
-pes.trimfill=trimfill(pes.ft)
+pes.trimfill=trimfill(pes.da)
 png("trimfill_ft.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.trimfill)
@@ -154,15 +154,17 @@ pes.adjusted=predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.adjusted)
 ```
 ```{r Egger's regression test with double arcsine transformation}
-regtest(pes.ft,model="lm",predictor="sei")
+regtest(pes.da,model="lm",predictor="sei")
 ```
 ```{r Rank correlation with double arcsine transformation}
-ranktest(pes.ft)
+ranktest(pes.da)
 ```
 ```{r Failsafe N test with double arcsine transformation}
-fsn(yi,vi,data=ies.ft)
+fsn(yi,vi,data=ies.da)
 ```
-
+```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
+weightfunct(ies.da$yi,ies.da$vi,steps=0.05)
+```
 
 
 
