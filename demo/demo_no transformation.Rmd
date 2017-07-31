@@ -120,6 +120,9 @@ regtest(pes,model="lm",predictor="sei")
 ```{r Rank correlation}
 ranktest(pes)
 ```
+```{r Failsafe N test}
+fsn(yi,vi,data=ies)
+```
 ```{r Vevea and Hedges Weight-Function Model with logit transformation}
 weightfunct(ies$yi,ies$vi,steps=0.05) 
 ```
