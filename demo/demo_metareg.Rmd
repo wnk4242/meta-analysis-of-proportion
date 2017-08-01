@@ -1,7 +1,6 @@
 ```{r Load libraries and set working directory}
 library(randomNames)
 library(metafor)
-setwd("D:/mydata")
 ```
 ```{r simulate a dataset}
 set.seed(1)
