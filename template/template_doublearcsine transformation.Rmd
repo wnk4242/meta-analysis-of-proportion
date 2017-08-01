@@ -9,8 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("your working directory")
-dat=read.csv("1stauthorpubyear.csv",header=T,sep=",")
+setwd("D:/mydata")
+dat=read.csv("dataset.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
 ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
