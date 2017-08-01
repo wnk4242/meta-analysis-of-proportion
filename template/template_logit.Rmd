@@ -55,8 +55,7 @@ forest(pes.forest,
        print.pval.Q=TRUE,
        print.I2=TRUE,
        print.tau2=FALSE,
-       col.by="grey",
-       digits=6)
+       col.by="grey")
 dev.off()
 ```
 ```{r Forest plot with logit transformation using metafor}
@@ -110,12 +109,12 @@ print(pes.leave1out)
 ```
 ```{r Subgroup analysis with logit transformation}
 #If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
-#subganal.moderatora=rma(yi,vi, data=ies.logit, mods = ~ moderatora, method="DL")
-#print(subganal.moderatora)
-#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-dat.diffvar= data.frame(estimate=c(pes.logit.mal1$b, pes.logit.mal2$b),stderror=c(pes.logit.mal1$se, pes.logit.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.logit.mal1$tau2, pes.logit.mal2$tau2),3))
-subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
+subganal.moderatora=rma(yi,vi, data=ies.logit, mods = ~ moderatora, method="DL")
 print(subganal.moderatora)
+#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
+#dat.diffvar= data.frame(estimate=c(pes.logit.mal1$b, pes.logit.mal2$b),stderror=c(pes.logit.mal1$se, pes.logit.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.logit.mal1$tau2, pes.logit.mal2$tau2),3))
+#subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
+#print(subganal.moderatora)
 ```
 ```{r Meta-regression with logit transformation}
 metareg.mod1=rma(yi,vi,data=ies.logit,mods=~moderator1,method="REML",test="z")

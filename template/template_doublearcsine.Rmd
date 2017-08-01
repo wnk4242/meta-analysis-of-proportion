@@ -85,8 +85,7 @@ addpoly(pes.mal1$pred,ci.lb=pes.mal1$ci.lb,ci.ub=pes.mal1$ci.ub,row=18.5,cex=0.8
 addpoly(pes.mal2$pred,ci.lb=pes.mal2$ci.lb,ci.ub=pes.mal2$ci.ub,row=0.5,cex=0.8,mlab="")
 addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-3,cex=0.8,mlab="")
 text(-2,-3,pos=4,cex=0.8, bquote(paste("All studies (Q = ",.(formatC(pes.da$QE, format="f")), ", df = ", .(pes.da$k - pes.da$p),", p = ", .(formatC(pes.da$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.da$I2, format="f")), "%",")")))
-text(-2,18.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.da.mal1$QE, format="f")), ", df = ", .(pes.da.mal1$k - pes.da.mal1$p),", p = ", .(formatC(pes.da.mal1$QEp, format="f")),
-"; ", I^2, " = ",.(formatC(pes.da.mal1$I2, format="f")), "%",")")))
+text(-2,18.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.da.mal1$QE, format="f")), ", df = ", .(pes.da.mal1$k - pes.da.mal1$p),", p = ", .(formatC(pes.da.mal1$QEp, format="f")),"; ", I^2, " = ",.(formatC(pes.da.mal1$I2, format="f")), "%",")")))
 text(-2,0.5,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.da.mal2$QE, format="f")),", df = ", .(pes.da.mal2$k - pes.da.mal2$p), ", p = ", .(formatC(pes.da.mal2$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.da.mal2$I2, format="f")), "%",")")))
 abline(h=-2)
 dev.off()
