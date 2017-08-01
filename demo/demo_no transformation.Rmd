@@ -9,8 +9,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("D:/mygithubproj/metaprops/data")
-dat=read.csv("xia.csv",header=T,sep=",")
+setwd("D:/mydata")
+dat=read.csv("dataset.csv",header=T,sep=",")
 ```
 ```{r Calculate overall and subgroup effect sizes}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
