@@ -23,9 +23,7 @@
 -这里有个类似的Shiny app也许可以给您提供一定灵感：http://kylehamilton.net/shiny/MAVIS/
 
 ```{r install required packages}
-install.packages('metafor')
-install.packages('meta')
-install.packages('weightr')
+install.packages(c("metafor","meta","weightr"))
 ```
 ```{r load required packages}
 library(metafor)
@@ -33,9 +31,9 @@ library(meta)
 library(weightr)
 ```
 ```{r read data files}
-#D:/mydata这个目录是我电脑里存储数据文件的位置
+#D:/data这个目录是我电脑里存储数据文件的位置
 #filename.csv是一个概括的名字，用户可以给自己的csv数据文件起名字。
-setwd("D:/mydata")
+setwd("D:/data")
 dat=read.csv("filename.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with no data transformation}

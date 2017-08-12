@@ -1,7 +1,5 @@
 ```{r Install required packages}
-install.packages('metafor')
-install.packages('meta')
-install.packages('weightr')
+install.packages(c("metafor","meta","weightr"))
 ```
 ```{r Load required packages}
 library(metafor)
@@ -9,8 +7,8 @@ library(meta)
 library(weightr)
 ```
 ```{r Read data files}
-setwd("D:/mydata")
-dat=read.csv("dataset.csv",header=T,sep=",")
+setwd("D:/data")
+dat=read.csv("data.csv",header=T,sep=",")
 ```
 ```{r Calculate overall effect size and subgroup effect sizes with Freeman-Tukey double arcsine transformation}
 ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
