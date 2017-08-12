@@ -1,7 +1,5 @@
 ```{r install required packages}
-#install.packages('metafor')
-#install.packages('meta')
-#install.packages('weightr')
+install.packages(c("metafor","meta","weightr"))
 ```
 ```{r load required packages}
 library(metafor)
