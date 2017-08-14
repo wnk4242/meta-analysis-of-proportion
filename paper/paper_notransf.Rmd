@@ -15,9 +15,9 @@ ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
 pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
 pes.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
 pes.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
-print(pes)
-print(pes.mal1)
-print(pes.mal2)
+print(pes);confint(pes)
+print(pes.mal1);confint(pes.mal1)
+print(pes.mal2);confint(pes.mal2)
 ```
 ```{r Forest plot using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
