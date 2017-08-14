@@ -18,9 +18,9 @@ pes.logit.mal2=rma(yi,vi,data=ies.logit,subset=moderatora=="level2",method="DL")
 pes=predict(pes.logit,transf=transf.ilogit)
 pes.mal1=predict(pes.logit.mal1,transf=transf.ilogit)
 pes.mal2=predict(pes.logit.mal2,transf=transf.ilogit)
-print(pes)
-print(pes.mal1)
-print(pes.mal2)
+print(pes);print(pes.logit);confint(pes.logit)
+print(pes.mal1);print(pes.logit.mal1);confint(pes.logit.mal1)
+print(pes.mal2);print(pes.logit.mal2);confint(pes.logit.mal2)
 ```
 ```{r Forest plot with logit transformation using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
@@ -87,11 +87,6 @@ text(-0.005,12.7,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit
 text(-0.005,-2.8,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.mal2$QE, format="f")),", df = ", .(pes.logit.mal2$k - pes.logit.mal2$p), ", p = ", .(formatC(pes.logit.mal2$QEp, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.mal2$I2, format="f")), "%",")")))
 abline(h=-4)
 dev.off()
-```
-```{r Heterogeneity test with logit transformation}
-print(pes.logit)
-print(pes.logit.mal1)
-print(pes.logit.mal2)
 ```
 ```{r Baujat plot with logit transformation}
 baujat(pes.logit)

@@ -18,9 +18,9 @@ pes.logit.others=rma(yi,vi,data=ies.logit,subset=studytype=="Others",method="DL"
 pes=predict(pes.logit,transf=transf.ilogit,digits=5)
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
-print(pes,digits=6)
-print(pes.birthcohort,digits=6)
-print(pes.others,digits=6)
+print(pes,digits=6);print(pes.logit,digits=2);confint(pes.logit,digits=2)
+print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
+print(pes.others,digits=6);print(pes.logit.others,digits=2);confint(pes.logit.others,digits=2)
 ```
 ```{r Forest plot with logit transformation using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
@@ -89,11 +89,6 @@ text(-0.005,12.7,pos=4,cex=1, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.b
 text(-0.005,-2.8,pos=4,cex=1, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
 abline(h=-4)
 dev.off()
-```
-```{r Heterogeneity test with logit transformation}
-print(pes.logit, digits=2)
-print(pes.logit.birthcohort, digits=2)
-print(pes.logit.others, digits=2)
 ```
 ```{r Baujat plot with logit transformation}
 baujat(pes.logit)

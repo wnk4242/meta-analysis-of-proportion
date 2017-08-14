@@ -15,9 +15,9 @@ ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
 pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
 pes.guangdong=rma(yi,vi,data=ies,subset=province=="Guangdong",method="DL")
 pes.guangxi=rma(yi,vi,data=ies,subset=province=="Guangxi",method="DL")
-print(pes,digits=3)
-print(pes.guangdong,digits=3)
-print(pes.guangxi,digits=3)
+print(pes,digits=3);confint(pes)
+print(pes.guangdong,digits=3);confint(pes.guangdong)
+print(pes.guangxi,digits=3);confint(pes.guangxi)
 ```
 ```{r Forest plot using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.

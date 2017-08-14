@@ -21,9 +21,9 @@ pes.microscopy=predict(pes.da.microscopy,transf=transf.ipft.hm,targ=list(ni=dat$
 ##pes=predict(pes.da,transf=transf.iarcsin)
 ##pes.endoscopy=predict(pes.da.endoscopy,transf=transf.iarcsin)
 ##pes.microscopy=predict(pes.da.microscopy,transf=transf.iarcsin)
-print(pes,digits=4)
-print(pes.endoscopy,digits=4)
-print(pes.microscopy,digits=4)
+print(pes,digits=4);print(pes.da,digits=2);confint(pes.da)
+print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2);confint(pes.da.endoscopy)
+print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2);confint(pes.da.microscopy)
 ```
 ```{r Forest plot with double arcsine transformation using metaprop}
 pes.forest=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
@@ -89,11 +89,6 @@ text(-2,-3,pos=4,cex=0.8,bquote(paste("All studies (Q = ",.(formatC(pes.da$QE, d
 text(-2,18.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.da.endoscopy$QE, digits=1, format="f")), ", df = ", .(pes.da.endoscopy$k - pes.da.endoscopy$p),", p = ", .(formatC(pes.da.endoscopy$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.da.endoscopy$I2, digits=1, format="f")), "%",")")))
 text(-2,0.5,pos=4,cex=0.8,bquote(paste("Subtotal(Q = ",.(formatC(pes.da.microscopy$QE, digits=1, format="f")),", df = ", .(pes.da.microscopy$k - pes.da.microscopy$p), ", p = ", .(formatC(pes.da.microscopy$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.da.microscopy$I2, digits=1, format="f")), "%",")")))
 abline(h=-2)
-```
-```{r Heterogeneity test with double arcsine transformation}
-print(pes.da,digits=2)
-print(pes.da.endoscopy,digits=2)
-print(pes.da.microscopy,digits=2)
 ```
 ```{r Baujat plot with double arcsine transformation}
 baujat(pes.da)
