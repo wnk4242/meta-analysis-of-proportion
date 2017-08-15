@@ -26,7 +26,7 @@ print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2);confint(pes.da.en
 print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2);confint(pes.da.microscopy)
 ```
 ```{r Forest plot with double arcsine transformation using metaprop}
-pes.forest=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.forest=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=1000,height=1000)
 forest(pes.forest,
        xlim = c(0,0.5), pscale =1, 

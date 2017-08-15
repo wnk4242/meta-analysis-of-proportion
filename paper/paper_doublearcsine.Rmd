@@ -24,7 +24,7 @@ print(pes.mal2);print(pes.transf.mal2);confint(pes.transf.mal2)
 ```
 ```{r Forest plot with double arcsine transformation using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PFT",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=1000,height=1000)
 forest(pes.forest,
        xlim = c(0,0.5), pscale =1, 

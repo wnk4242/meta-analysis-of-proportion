@@ -21,7 +21,7 @@ print(pes.mal2);confint(pes.mal2)
 ```
 ```{r Forest plot using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PRAW",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PRAW",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=1000,height=1000)
 forest(pes.forest,
        xlim = c(0,1), pscale =1, 
