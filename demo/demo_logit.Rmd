@@ -1,31 +1,88 @@
-```{r Install required packages}
-install.packages(c("metafor","meta","weightr"))
+```{r Installing required packages}
+install.packages(c("metafor","meta","weightr"))#Already installed
 ```
-```{r Load required packages}
+```{r Loading packages}
 library(metafor)
 library(meta)
 library(weightr)
 ```
-```{r Read data files}
-setwd("D:/data")
+```{r Reading in data}
 dat=read.csv("data.csv",header=T,sep=",")
 ```
-```{r Calculate overall effect size and subgroup effect sizes with logit transformation}
+```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
+pes=predict(pes.logit,transf=transf.ilogit,digits=5)
+print(pes,digits=5);print(pes.logit,digits=4);confint(pes.logit,digits=2)
+```
+```{r Calculating subgroup summary proportions according to study type}
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studytype=="Birth cohort",method="DL")
 pes.logit.others=rma(yi,vi,data=ies.logit,subset=studytype=="Others",method="DL")
-pes=predict(pes.logit,transf=transf.ilogit,digits=5)
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
-print(pes,digits=6);print(pes.logit,digits=2);confint(pes.logit,digits=2)
-print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
-print(pes.others,digits=6);print(pes.logit.others,digits=2);confint(pes.logit.others,digits=2)
+print(pes.birthcohort,digits=5);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
+print(pes.others,digits=5);print(pes.logit.others,digits=2);confint(pes.logit.others,digits=2)
 ```
-```{r Forest plot with logit transformation using metaprop}
-#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-pes.forest=metaprop(cases,total,author,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot.png",width=1000,height=1000)
+```{r Finding outliers with residuals}
+stud.res=rstudent(pes.logit)
+abs.z=abs(stud.res$z)
+stud.res[order(-abs.z)]
+```
+```{r Leave-one-out analysis}
+pes.leave1out=leave1out(pes.logit,transf=transf.ilogit)
+print(pes.leave1out,digits=5)
+```
+```{r Baujat plot}
+baujat(pes.logit)
+```
+```{r Diagnostic tests}
+inf=influence(pes.logit)
+print(inf);plot(inf)
+```
+```{r Removing outliers}
+ies.logit.noutlier=escalc(xi=cases,ni=total,measure="PLO", data=dat[-c(2,3),])
+pes.logit.noutlier=rma(yi,vi,data=ies.logit.noutlier,method="DL",weighted=TRUE)
+pes.noutlier=predict(pes.logit.noutlier,transf=transf.ilogit)
+print(pes,digits=5)
+print(pes.noutlier,digits=5)
+```
+```{r Forest plot using metafor}
+#If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
+png("forestplot_metafor.png",width=750,height=700)
+ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
+forest(ies.summary$yi,
+       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
+       slab=paste(dat$author,dat$year, sep=", "),
+       ilab=cbind(data=dat$cases, dat$total),
+       ilab.xpos=c(-0.002,-0.001),
+       rows=c(19:14, 8.5:-1.5),
+       at=c(seq(from=0,to=0.004,by=0.001)), 
+       refline=pes$pred,
+       ylim=c(-5,24),
+       xlim=c(-0.005,0.005),
+       cex=1,
+       font=1,
+       main="Effect size by study type (RE Model)",
+       xlab="Proportion",
+       digits=4
+       )
+text(-0.005,23,pos=4,cex=1.2,font=9,"Author, Year")
+text(c(-0.0022,-0.0012),23,pos=4,cex=1.2,font=9,c("Cases", "Total"))
+text(0.003,23,pos=4,cex=1.2,font=9,"Proportion [95% CI]")
+text(-0.005,c(10,20.5),pos=4, cex=1.2,font=1,c("Others", "Birth Cohort"))
+addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,digits=5,cex=1.1,mlab="")
+addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,digits=5,cex=1.1,mlab="")
+addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,digits=5,cex=1.1,mlab="")
+text(-0.005,-5,pos=4,cex=1.1,bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1,format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
+text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.birthcohort$QE, digits=1, format="f")), ", df = ", .(pes.logit.birthcohort$k - pes.logit.birthcohort$p),", p = ", .(formatC(pes.logit.birthcohort$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.birthcohort$I2, digits=1, format="f")), "%",")")))
+text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
+abline(h=-4)
+dev.off()
+```
+```{r Forest plot using meta}
+#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
+pes.forest=metaprop(cases,total,authoryear,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot_meta.png",width=700,height=600)
 forest(pes.forest,
        xlim = c(0,0.005), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
@@ -54,91 +111,79 @@ forest(pes.forest,
        print.I2=TRUE,
        print.tau2=FALSE,
        col.by="grey",
-       digits=6)
+       digits=5)
 dev.off()
 ```
-```{r Forest plot with logit transformation using metafor}
-#If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-png("forestplot.png",width=1000,height=1000)
-ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
-forest(ies.summary$yi,
-       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
-       slab=paste(dat$author,dat$year, sep=", "),
-       ilab=cbind(data=dat$cases, dat$total),
-       ilab.xpos=c(-0.002,-0.001),
-       rows=c(19:14, 8.5:-1.5),
-       at=c(seq(from=0,to=0.004,by=0.001)), 
-       refline=pes$pred,
-       ylim=c(-5,24),
-       xlim=c(-0.005,0.005),
-       cex=1,
-       font=6,
-       main="Effect size by study type (RE Model)",
-       xlab="Proportion",
-       digits=5
-       )
-text(-0.005, 23,pos=4,cex=1,font=6,"Author(s), Year")
-text(-0.005,c(10,20.5),pos=4, cex=1,font=6,c("Others", "Birth Cohort"))
-text(c(-0.0022,-0.0012), 23,pos=4,cex=1,font=6,c("Cases", "Total"))
-text(0.0035,23,pos=4,font=6,cex=1,"Proportion [95% CI]")
-addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,digits=6,cex=1,mlab="")
-addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.5,digits=6,cex=1,mlab="")
-addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,digits=6,cex=1,mlab="")
-text(-0.005,-5,pos=4,cex=1, bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1, format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
-text(-0.005,12.7,pos=4,cex=1, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.birthcohort$QE, digits=1, format="f")), ", df = ", .(pes.logit.birthcohort$k - pes.logit.birthcohort$p),", p = ", .(formatC(pes.logit.birthcohort$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.birthcohort$I2, digits=1, format="f")), "%",")")))
-text(-0.005,-2.8,pos=4,cex=1, bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
-abline(h=-4)
-dev.off()
+```{r Subgroup analysis assuming a common among-study variance component across subgroups}
+#Pool within-group estimates of tau-squared.
+subganal.worldregion=rma(yi,vi,data=ies.logit,mods=~worldregion,method="REML")
+subganal.researchperiod=rma(yi,vi,data=ies.logit,mods=~researchperiod,method="REML")
+subganal.agediagnosed=rma(yi,vi,data=ies.logit,mods=~agediagnosed,method="REML")
+subganal.samplesize=rma(yi,vi,data=ies.logit,mods=~samplesize,method="REML")
+subganal.studytype=rma(yi,vi,data=ies.logit,mods=~studytype,method="DL")
+subganal.periodagesize=rma(yi,vi,data=ies.logit,mods=~researchperiod+agediagnosed+samplesize,method="REML")
+print(subganal.worldregion,digits=4)
+print(subganal.researchperiod,digits=4)
+print(subganal.agediagnosed,digits=4)
+print(subganal.samplesize,digits=4)
+print(subganal.studytype,digits=4)
+print(subganal.periodagesize,digits=4)
 ```
-```{r Baujat plot with logit transformation}
-baujat(pes.logit)
+```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
+#Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
+dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
+subganal.studytype=rma(estimate,sei=stderror,mods=~studytype,method="FE",data=dat.diffvar,digits=2)
+print(subganal.studytype,digits=2)
 ```
-```{r Diagnostic tests with logit transformation}
-inf=influence(pes.logit)
-print(inf,digits=2)
-plot(inf)
+```{r Scatter plot for study type}
+subganal.stutype=rma(yi,vi,data=ies.logit,mods=~stutype,method="REML")
+preds.stutype=predict(subganal.stutype,newmods=c(0:2),transf=transf.ilogit)
+wi=1/sqrt(ies.logit$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+plot(ies.logit$stutype,transf.ilogit(ies.logit$yi),cex=size,pch=1,las=1,xlab="Study Type", ylab="Proportion")
+lines(0:2,preds.stutype$pred,col="navy")
+lines(0:2,preds.stutype$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.stutype$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(2)
+text(ies.logit$stutype[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Leave-one-out analysis with logit transformation}
-pes.leave1out=leave1out(pes.logit,transf=transf.ilogit,digits=6)
-print(pes.leave1out)
+```{r Scatter plot for sample size}
+subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="REML")
+preds.size=predict(subganal.size,newmods=c(0:2))
+wi=1/sqrt(ies.logit$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+plot(ies.logit$size,ies.logit$yi,cex=size,pch=1,las=1,xlab="Sample size", ylab="Logit event rate")
+lines(0:2,preds.size$pred,col="navy")
+lines(0:2,preds.size$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.size$ci.ub,lty="dashed",col="maroon")
+pos=c(2)
 ```
-```{r Subgroup analysis with logit transformation}
-#If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
-#subganal.studytype=rma(yi,vi, data=ies.logit, mods = ~ studytype, method="DL")
-#print(subganal.studytype)
-#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-dat.diffvar= data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studytype=rma(estimate, sei=stderror, mods = ~ studytype, method="FE", data=dat.diffvar, digits=4)
-print(subganal.studytype,digits=3)
-```
-```{r Funnel plot with logit transformation}
-png("funnel.png",width=1000,height=1000)
+```{r Funnel plot}
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
-#funnel(pes.logit,yaxis="sei")
+funnel(pes.logit,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
-dev.off()
+#funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
 ```
-```{r Trim and fill plot with logit transformation}
+```{r Trim and fill plot}
+pes
 pes.trimfill=trimfill(pes.logit)
-png("trimfill.png",width=1000,height=1000)
+predict(pes.trimfill,transf=transf.ilogit,digits=5)
+pes.trimfill
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
-#funnel(pes.trimfill)
+funnel(pes.trimfill)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
-dev.off()
-pes.adjusted=predict(pes.trimfill,transf=transf.ilogit)
-print(pes.adjusted,digits=6)
+#funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
 ```
-```{r Egger's regression test with logit transformation}
+```{r Egger's regression test}
 regtest(pes.logit,model="lm",predictor="sei")
 ```
-```{r Rank correlation with logit transformation}
+```{r Rank correlation}
 ranktest(pes.logit)
 ```
-```{r Failsafe N test with logit transformation}
-fsn(yi,vi,data=ies.logit)
-```
-```{r Vevea and Hedges Weight-Function Model with logit transformation}
+```{r Vevea and Hedges Weight-Function Model}
 weightfunct(ies.logit$yi,ies.logit$vi,steps=0.05)
+```
+```{r Failsafe N test}
+fsn(yi,vi,data=ies.logit)
 ```
