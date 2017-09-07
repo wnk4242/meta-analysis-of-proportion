@@ -1,8 +1,8 @@
-```{r Load libraries and set working directory}
+```{r Loading libraries}
 library(randomNames)
 library(metafor)
 ```
-```{r simulate a dataset}
+```{r Simulating a dataset}
 set.seed(1)
 randomNames(30,which.names="last")
 author=randomNames(30,which.names="last")
@@ -20,10 +20,10 @@ moderator2=sample(18:99,30,replace=TRUE) #age
 studies=cbind(author, year,cases, total, moderator1, moderator2)
 write.csv(studies,file="simdat.csv")
 ```
-```{r Read the dataset simulated}
+```{r Reading in the dataset simulated}
 dat=read.csv("simdat.csv",header=T,sep=",")
 ```
-```{r Calculate individual effect sizes}
+```{r Calculating individual effect sizes}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
 ```
 ```{r Meta-regression}
@@ -31,7 +31,7 @@ ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
 metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
-```{r Bubble plot}
+```{r Scatterplot}
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
 pes=predict(metareg.mod1,newmods=c(0:40))
@@ -43,14 +43,14 @@ ids=c(1:6)
 pos=c(1)
 text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Calculate individual effect sizes with logit transformation}
+```{r Calculating individual effect sizes with logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 ```
 ```{r Meta-regression with logit transformation}
 metareg.mod1=rma(yi,vi,data=ies.logit,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
-```{r Bubble plot with logit transformed data}
+```{r Scatterplot with logit transformed data}
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
 pes.logit=predict(metareg.mod1,newmods=c(0:40),transf=transf.ilogit)
@@ -62,14 +62,14 @@ ids=c(1:6)
 pos=c(1)
 text(ies.logit$moderator1[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Calculate individual effect sizes with Freeman-Tukey double arcsine transformation}
+```{r Calculating individual effect sizes with Freeman-Tukey double arcsine transformation}
 ies.da=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
 ```
 ```{r Meta-regression with double arcsine transformation}
 metareg.mod1=rma(yi,vi,data=ies.da,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
-```{r Bubble plot with double arcsine transformed data}
+```{r Scatterplot with double arcsine transformed data}
 wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
 pes.da=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
