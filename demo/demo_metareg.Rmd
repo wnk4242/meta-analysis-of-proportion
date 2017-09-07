@@ -26,12 +26,12 @@ dat=read.csv("simdat.csv",header=T,sep=",")
 ```{r Calculating individual effect sizes}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
 ```
-```{r Meta-regression}
+```{r Meta-regression for month}
 #If you want to analyze two or more moderators: mods=~month+age+...
 metareg.month=rma(yi,vi,data=ies,mods=~month,method="REML",test="z")
 print(metareg.month)
 ```
-```{r Scatterplot}
+```{r Scatterplot for month}
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
 preds.month=predict(metareg.month,newmods=c(0:40))
@@ -46,11 +46,15 @@ text(ies$month[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
 ```{r Calculating individual effect sizes with logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 ```
-```{r Meta-regression with logit transformation}
+```{r Meta-regression with logit transformation for month}
 metareg.month=rma(yi,vi,data=ies.logit,mods=~month,method="REML",test="z")
 print(metareg.month)
 ```
-```{r Scatterplot with logit transformed data}
+```{r Meta-regression with logit transformation for age}
+metareg.age=rma(yi,vi,data=ies.logit,mods=~age,method="REML")
+print(metareg.age)
+```
+```{r Scatterplot with logit transformation for month}
 #If you want the y-axis to be expressed as a proportion
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
@@ -63,7 +67,7 @@ ids=c(1:6)
 pos=c(1)
 text(ies.logit$month[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Scatterplot with logit transformed data}
+```{r Scatterplot with logit transformation for month}
 #If you want the y-axis to be expressed as a logit event rate
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
@@ -76,14 +80,40 @@ ids=c(1:6)
 pos=c(1)
 text(ies.logit$month[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Calculating individual effect sizes with Freeman-Tukey double arcsine transformation}
+```{r Scatterplot with logit transformation for age}
+#If you want the y-axis to be expressed as a proportion
+wi=1/sqrt(ies.logit$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+preds.age=predict(metareg.age,newmods=c(0:100),transf=transf.ilogit)
+plot(ies.logit$age,transf.ilogit(ies.logit$yi),cex=size,pch=1,xlab="Age", ylab="Proportion",las=1)
+lines(0:100,preds.age$pred)
+lines(0:100,preds.age$ci.lb,lty="dashed")
+lines(0:100,preds.age$ci.ub,lty="dashed")
+ids=c(1:6)
+pos=c(1)
+text(ies.logit$age[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
+```
+```{r Scatterplot with logit transformation for age}
+#If you want the y-axis to be expressed as a logit event rate
+wi=1/sqrt(ies.logit$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+preds.age=predict(metareg.age,newmods=c(0:100))
+plot(ies.logit$age,ies.logit$yi,cex=size,pch=1,xlab="Age", ylab="Logit event rate",las=1)
+lines(0:100,preds.age$pred)
+lines(0:100,preds.age$ci.lb,lty="dashed")
+lines(0:100,preds.age$ci.ub,lty="dashed")
+ids=c(1:6)
+pos=c(1)
+text(ies.logit$age[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
+```
+```{r Calculating individual effect sizes with double arcsine transformation}
 ies.da=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
 ```
-```{r Meta-regression with double arcsine transformation}
+```{r Meta-regression with double arcsine transformation for month}
 metareg.month=rma(yi,vi,data=ies.da,mods=~month,method="REML",test="z")
 print(metareg.month)
 ```
-```{r Scatterplot with double arcsine transformed data}
+```{r Scatterplot with double arcsine transformation for month}
 #If you want the y-axis to be expressed as a proportion
 wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
@@ -96,7 +126,7 @@ ids=c(1:6)
 pos=c(3)
 text(ies.da$month[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Scatterplot with double arcsine transformed data}
+```{r Scatterplot with double arcsine transformation for month}
 #If you want the y-axis to be expressed as a double arcsine transformed proportion
 wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
