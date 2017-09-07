@@ -1,5 +1,5 @@
 ```{r Installing required packages}
-install.packages(c("metafor","meta"))
+install.packages(c("metafor","meta"))#Already installed
 ```
 ```{r Loading packages}
 library(metafor)
@@ -102,19 +102,24 @@ dev.off()
 ```
 ```{r Subgroup analysis assuming a common among-study variance component across subgroups}
 #Pool within-group estimates of tau-squared.
-subganal.guangs=rma(yi,vi,data=ies,mods=~province,method="DL")
-print(subganal.guangs)
+subganal.province=rma(yi,vi,data=ies,mods=~province,method="DL")
+print(subganal.province)
 ```
 ```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
 #Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
 dat.diffvar= data.frame(estimate=c(pes.guangdong$b, pes.guangxi$b),stderror=c(pes.guangdong$se, pes.guangxi$se),province = c("Guangdong","Guangxi"), tau2=round(c(pes.guangdong$tau2, pes.guangxi$tau2),3))
-subganal.guangs=rma(estimate, sei=stderror, mods =~province, method="FE", data=dat.diffvar)
-print(subganal.guangs)
+subganal.province=rma(estimate, sei=stderror, mods=~province, method="FE", data=dat.diffvar)
+print(subganal.province)
 ```
-```{r Scatter plot for province}
+```{r Scatterplot for province}
+subganal.prov=rma(yi,vi,data=ies,mods=~prov,method="DL",weighted=TRUE)
+preds.prov=predict(subganal.prov,newmods=c(0:2))
 wi=1/sqrt(ies$vi)
-size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+prov=1+3*(wi-min(wi))/(max(wi)-min(wi))
 plot(ies$prov,ies$yi,cex=size,pch=1,las=1,xlab="Province", ylab="Proportion")
+lines(0:2,preds.prov$pred,col="navy")
+lines(0:2,preds.prov$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.prov$ci.ub,lty="dashed",col="maroon")
 ```
 ```{r Funnel plot}
 funnel(pes)

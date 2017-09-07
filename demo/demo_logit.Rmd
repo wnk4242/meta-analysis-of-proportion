@@ -135,7 +135,7 @@ dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),st
 subganal.studytype=rma(estimate,sei=stderror,mods=~studytype,method="FE",data=dat.diffvar)
 print(subganal.studytype,digits=2)
 ```
-```{r Scatter plot for study type}
+```{r Scatterplot for study type}
 subganal.stutype=rma(yi,vi,data=ies.logit,mods=~stutype,method="REML")
 preds.stutype=predict(subganal.stutype,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies.logit$vi)
@@ -148,7 +148,7 @@ ids=c(1:6)
 pos=c(2)
 text(ies.logit$stutype[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
-```{r Scatter plot for sample size}
+```{r Scatterplot for sample size}
 subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="REML")
 preds.size=predict(subganal.size,newmods=c(0:2))
 wi=1/sqrt(ies.logit$vi)
