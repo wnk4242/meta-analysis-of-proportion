@@ -23,7 +23,7 @@ pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
 print(pes.birthcohort,digits=5);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
 print(pes.others,digits=5);print(pes.logit.others,digits=2);confint(pes.logit.others,digits=2)
 ```
-```{r Finding outliers with residuals}
+```{r Identifying outliers with residuals}
 stud.res=rstudent(pes.logit)
 abs.z=abs(stud.res$z)
 stud.res[order(-abs.z)]
