@@ -130,13 +130,13 @@ print(subganal.procedure)
 #If you want the y-axis to be expressed as a double arcsine transformed proportion
 wi=1/sqrt(ies.da$vi)
 procedure=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies.da$proced,ies.da$yi,cex=ies.da$proced,pch=1,las=1,xlab="Procedure", ylab="Double arcsine transformed proportions")
+plot(ies.da$proced,ies.da$yi,cex=size,pch=1,las=1,xlab="Procedure", ylab="Double arcsine transformed proportions")
 ```
 ```{r Scatter plot for procedure}
 #If you want the y-axis to be expressed as a proportion
 wi=1/sqrt(ies.da$vi)
 procedure=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies.da$proced,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=ies.da$proced,pch=1,las=1,xlab="Procedure", ylab="Proportions")
+plot(ies.da$proced,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=size,pch=1,las=1,xlab="Procedure", ylab="Proportions")
 ```
 ```{r Funnel plot}
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.

@@ -114,7 +114,7 @@ print(subganal.guangs)
 ```{r Scatter plot for province}
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies$prov,ies$yi,cex=ies$prov,pch=1,las=1,xlab="Province", ylab="Proportion")
+plot(ies$prov,ies$yi,cex=size,pch=1,las=1,xlab="Province", ylab="Proportion")
 ```
 ```{r Funnel plot}
 funnel(pes)
