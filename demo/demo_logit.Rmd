@@ -132,7 +132,7 @@ print(subganal.periodagesize,digits=4)
 ```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
 #Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
 dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studytype=rma(estimate,sei=stderror,mods=~studytype,method="FE",data=dat.diffvar,digits=2)
+subganal.studytype=rma(estimate,sei=stderror,mods=~studytype,method="FE",data=dat.diffvar)
 print(subganal.studytype,digits=2)
 ```
 ```{r Scatter plot for study type}
