@@ -7,12 +7,12 @@ set.seed(1)
 randomNames(30,which.names="last")
 author=randomNames(30,which.names="last")
 year=sample(2000:2017,30,replace=T)
-minsize = 30
-maxsize = 200
-minsample = 0
-maxsample = 1
-studies = data.frame(cases = runif(30,min = minsample,max = maxsample),total = sample(minsize:maxsize,30,replace = TRUE))
-studies$cases = round(studies$cases * studies$total)
+minsize=30
+maxsize=200
+minsample=0
+maxsample=1
+studies=data.frame(cases=runif(30,min=minsample,max=maxsample),total=sample(minsize:maxsize,30,replace=TRUE))
+studies$cases=round(studies$cases * studies$total)
 cases=studies$cases
 total=studies$total
 moderator1=sample(1:36,30,replace=TRUE) #number of months of treatment before dropout
@@ -39,8 +39,8 @@ plot(ies$moderator1,ies$yi,cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",
 lines(0:40,pes$pred)
 lines(0:40,pes$ci.lb,lty="dashed")
 lines(0:40,pes$ci.ub,lty="dashed")
-ids <- c(1:6)
-pos <- c(1)
+ids=c(1:6)
+pos=c(1)
 text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Calculate individual effect sizes with logit transformation}
@@ -58,8 +58,8 @@ plot(ies.logit$moderator1,transf.ilogit(ies.logit$yi),cex=size,pch=1,xlab="Moder
 lines(0:40,pes.logit$pred)
 lines(0:40,pes.logit$ci.lb,lty="dashed")
 lines(0:40,pes.logit$ci.ub,lty="dashed")
-ids <- c(1:6)
-pos <- c(1)
+ids=c(1:6)
+pos=c(1)
 text(ies.logit$moderator1[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Calculate individual effect sizes with Freeman-Tukey double arcsine transformation}
@@ -77,7 +77,7 @@ plot(ies.da$moderator1,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=siz
 lines(0:40,pes.da$pred)
 lines(0:40,pes.da$ci.lb,lty="dashed")
 lines(0:40,pes.da$ci.ub,lty="dashed")
-ids <- c(1:6)
-pos <- c(3)
+ids=c(1:6)
+pos=c(3)
 text(ies.da$moderator1[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
 ```
