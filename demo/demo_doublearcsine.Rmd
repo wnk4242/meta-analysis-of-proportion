@@ -118,7 +118,7 @@ forest(pes.forest,
 dev.off()
 ```
 ```{r Subgroup analysis assuming a common among-study variance component across subgroups}
-subganal.procedure=rma(yi,vi, data=ies.da, mods =~procedure, method="FE")
+subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="FE")
 print(subganal.procedure)
 ```
 ```{r Subgroup analysis not assuming a common among-study variance component across subgroups}

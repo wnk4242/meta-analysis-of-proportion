@@ -1,60 +1,49 @@
-```{r Install required packages}
+```{r Installing required packages}
 install.packages(c("metafor","meta","weightr"))
 ```
-```{r Load required packages}
+```{r Loading packages}
 library(metafor)
 library(meta)
 library(weightr)
 ```
-```{r Read data files}
-setwd("D:/data")
+```{r Reading in data}
 dat=read.csv("data.csv",header=T,sep=",")
 ```
-```{r Calculate overall effect size and subgroup effect sizes with logit transformation}
+```{r Calculating overall summary proportion}
 ies=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.transf=rma(yi,vi,data=ies,method="DL",weighted=TRUE)
+pes=predict(pes.transf,transf=transf.ilogit)
+print(pes);print(pes.transf);confint(pes.transf)
+```
+```{r Calculating subgroup summary proportions according to study type}
 pes.transf.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
 pes.transf.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
-pes=predict(pes.transf,transf=transf.ilogit)
 pes.mal1=predict(pes.transf.mal1,transf=transf.ilogit)
 pes.mal2=predict(pes.transf.mal2,transf=transf.ilogit)
-print(pes);print(pes.transf);confint(pes.transf)
 print(pes.mal1);print(pes.transf.mal1);confint(pes.transf.mal1)
 print(pes.mal2);print(pes.transf.mal2);confint(pes.transf.mal2)
 ```
-```{r Forest plot with logit transformation using metaprop}
-#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot.png",width=1000,height=1000)
-forest(pes.forest,
-       xlim = c(0,0.005), pscale =1, 
-       rightcols=c("effect", "ci","w.random"),
-       rightlabs=c("Proportion", "95% C.I.","Weights"),
-       leftcols = c("studlab", "event", "n"), 
-       leftlabs = c("Study", "Cases", "Total"),
-       xlab = "Prevalence", 
-       fs.xlab=12,
-       fs.study=12,
-       fs.study.lables=12,
-       fs.heading=12,
-       squaresize = 0.5, col.square="navy", col.square.lines="navy",
-       col.diamond="navy", col.diamond.lines="navy",
-       comb.fixed=FALSE,
-       lty.fixed=0,
-       lty.random=2, 
-       type.study="square",
-       type.random="diamond",
-       ff.fixed="bold.italic",
-       ff.random="bold.italic",
-       hetlab = "Heterogeneity:",
-       fs.hetstat=10,
-       smlab="",
-       print.Q=TRUE,
-       print.pval.Q=TRUE,
-       print.I2=TRUE,
-       print.tau2=FALSE,
-       col.by="grey")
-dev.off()
+```{r Identifying outliers with residuals}
+stud.res=rstudent(pes.transf)
+abs.z=abs(stud.res$z)
+stud.res[order(-abs.z)]
+```
+```{r Leave-one-out analysis}
+pes.leave1out=leave1out(pes.transf,transf=transf.ilogit)
+print(pes.leave1out)
+```
+```{r Baujat plot with logit transformation}
+baujat(pes.transf)
+```
+```{r Diagnostic tests with logit transformation}
+inf=influence(pes.transf)
+print(inf);plot(inf)
+```
+```{r Removing outliers}
+ies.noutlier=escalc(xi=cases,ni=total,measure="PLO", data=dat[-c(2,3),])
+pes.transf.noutlier=rma(yi,vi,data=ies.noutlier,method="DL",weighted=TRUE)
+pes.noutlier=predict(pes.transf.noutlier,transf=transf.ilogit)
+print(pes.noutlier,digits=5)
 ```
 ```{r Forest plot with logit transformation using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
@@ -88,45 +77,70 @@ text(-0.005,-2.8,pos=4,cex=0.8, bquote(paste("Subtotal(Q = ",.(formatC(pes.trans
 abline(h=-4)
 dev.off()
 ```
-```{r Baujat plot with logit transformation}
-baujat(pes.transf)
+```{r Forest plot using metaprop}
+#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your dataset.
+pes.forest=metaprop(cases,total,author,data=dat,byvar=moderatora,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+png("forestplot.png",width=1000,height=1000)
+forest(pes.forest,
+       xlim = c(0,0.005), pscale =1, 
+       rightcols=c("effect", "ci","w.random"),
+       rightlabs=c("Proportion", "95% C.I.","Weights"),
+       leftcols = c("studlab", "event", "n"), 
+       leftlabs = c("Study", "Cases", "Total"),
+       xlab = "Prevalence", 
+       fs.xlab=12,
+       fs.study=12,
+       fs.study.lables=12,
+       fs.heading=12,
+       squaresize = 0.5, col.square="navy", col.square.lines="navy",
+       col.diamond="navy", col.diamond.lines="navy",
+       comb.fixed=FALSE,
+       lty.fixed=0,
+       lty.random=2, 
+       type.study="square",
+       type.random="diamond",
+       ff.fixed="bold.italic",
+       ff.random="bold.italic",
+       hetlab = "Heterogeneity:",
+       fs.hetstat=10,
+       smlab="",
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       print.tau2=FALSE,
+       col.by="grey")
+dev.off()
 ```
-```{r Diagnostic tests with logit transformation}
-inf=influence(pes.transf)
-print(inf)
-plot(inf)
-```
-```{r Leave-one-out analysis with logit transformation}
-pes.leave1out=leave1out(pes.transf,transf=transf.ilogit)
-print(pes.leave1out)
-```
-```{r Subgroup analysis with logit transformation}
-#If you assume a common among-study variance component across subgroups (pool within-group estimates of tau-squared), then remove the "#" sign before the following two lines.
-subganal.moderatora=rma(yi,vi, data=ies, mods = ~ moderatora, method="DL")
+```{r Subgroup analysis assuming a common among-study variance component across subgroups}
+#Pool within-group estimates of tau-squared.
+subganal.moderatora=rma(yi,vi,data=ies,mods=~moderatora,method="DL")
 print(subganal.moderatora)
-#If you do not assume a common among-study variance component across subgroups (do not pool within-group estimates of tau-squared), then remove the "#" sign before the following three lines. This is the option used by RevMan.
-#dat.diffvar= data.frame(estimate=c(pes.transf.mal1$b, pes.transf.mal2$b),stderror=c(pes.transf.mal1$se, pes.transf.mal2$se),moderatora = c("mal1","mal2"), tau2=round(c(pes.transf.mal1$tau2, pes.transf.mal2$tau2),3))
-#subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
-#print(subganal.moderatora)
 ```
-```{r Meta-regression with logit transformation}
+```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
+#Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
+dat.diffvar= data.frame(estimate=c(pes.transf.mal1$b, pes.transf.mal2$b),stderror=c(pes.transf.mal1$se, pes.transf.mal2$se),moderatora=c("mal1","mal2"),tau2=round(c(pes.transf.mal1$tau2, pes.transf.mal2$tau2),3))
+subganal.moderatora=rma(estimate,sei=stderror,mods=~moderatora,method="FE",data=dat.diffvar)
+print(subganal.moderatora)
+```
+```{r Meta-regression}
+#If you want to analyze two or more moderators: mods=~moderator1+moderator2+...
 metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
 print(metareg.mod1)
 ```
-```{r Bubble plot with logit transformed data}
-#Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
+```{r Scatterplot}
+#Numerical values in the following code are for demonstration purposes only. You need to change these values according to your dataset.
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-pes.bb=predict(metareg.mod1,newmods=c(0:40),transf=transf.ilogit)
-plot(ies$moderator1,transf.ilogit(ies$yi),cex=size,pch=1,xlab="Moderator 1", ylab="Proportion",las=1)
-lines(0:40,pes.bb$pred)
-lines(0:40,pes.bb$ci.lb,lty="dashed")
-lines(0:40,pes.bb$ci.ub,lty="dashed")
-ids <- c(1:6)
-pos <- c(1)
-text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
+preds.mod1=predict(metareg.mod1,newmods=c(0:40),transf=transf.ilogit)
+plot(ies$moderator1,transf.ilogit(ies$yi),cex=size,pch=1,xlab="Moderator 1",ylab="Proportion",las=1)
+lines(0:40,preds.mod1$pred)
+lines(0:40,preds.mod1$ci.lb,lty="dashed")
+lines(0:40,preds.mod1$ci.ub,lty="dashed")
+ids=c(1:6)
+pos=c(1)
+text(ies$moderator1[ids],transf.ilogit(ies$yi)[ids],ids,cex=0.9,pos=pos)
 ```
-```{r Funnel plot with logit transformation}
+```{r Funnel plot}
 png("funnel.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
 #funnel(pes.transf,yaxis="sei")
@@ -134,7 +148,7 @@ png("funnel.png",width=1000,height=1000)
 funnel(pes.transf,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
 dev.off()
 ```
-```{r Trim and fill plot with logit transformation}
+```{r Trim and fill plot}
 pes.trimfill=trimfill(pes.transf)
 png("trimfill.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
@@ -145,15 +159,15 @@ dev.off()
 pes.trimfill=predict(pes.trimfill,transf=transf.ilogit)
 print(pes.trimfill)
 ```
-```{r Egger's regression test with logit transformation}
+```{r Egger's regression test}
 regtest(pes.transf,model="lm",predictor="sei")
 ```
-```{r Rank correlation with logit transformation}
+```{r Rank correlation}
 ranktest(pes.transf)
 ```
-```{r Failsafe N test with logit transformation}
-fsn(yi,vi,data=ies)
-```
-```{r Vevea and Hedges Weight-Function Model with logit transformation}
+```{r Vevea and Hedges Weight-Function Model}
 weightfunct(ies$yi,ies$vi,steps=0.05)
+```
+```{r Failsafe N test}
+fsn(yi,vi,data=ies)
 ```
