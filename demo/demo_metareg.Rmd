@@ -41,44 +41,14 @@ lines(0:40,preds.month$ci.lb,lty="dashed")
 lines(0:40,preds.month$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies$month[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies$month[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Calculating individual effect sizes with logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 ```
-```{r Meta-regression with logit transformation for month}
-metareg.month=rma(yi,vi,data=ies.logit,mods=~month,method="REML",test="z")
-print(metareg.month)
-```
 ```{r Meta-regression with logit transformation for age}
 metareg.age=rma(yi,vi,data=ies.logit,mods=~age,method="REML")
 print(metareg.age)
-```
-```{r Scatterplot with logit transformation for month}
-#If you want the y-axis to be expressed as a proportion
-wi=1/sqrt(ies.logit$vi)
-size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-preds.month=predict(metareg.month,newmods=c(0:40),transf=transf.ilogit)
-plot(ies.logit$month,transf.ilogit(ies.logit$yi),cex=size,pch=1,xlab="Month", ylab="Proportion",las=1)
-lines(0:40,preds.month$pred)
-lines(0:40,preds.month$ci.lb,lty="dashed")
-lines(0:40,preds.month$ci.ub,lty="dashed")
-ids=c(1:6)
-pos=c(1)
-text(ies.logit$month[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
-```
-```{r Scatterplot with logit transformation for month}
-#If you want the y-axis to be expressed as a logit event rate
-wi=1/sqrt(ies.logit$vi)
-size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-preds.month=predict(metareg.month,newmods=c(0:40))
-plot(ies.logit$month,ies.logit$yi,cex=size,pch=1,xlab="Month", ylab="Logit event rate",las=1)
-lines(0:40,preds.month$pred)
-lines(0:40,preds.month$ci.lb,lty="dashed")
-lines(0:40,preds.month$ci.ub,lty="dashed")
-ids=c(1:6)
-pos=c(1)
-text(ies.logit$month[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
 ```
 ```{r Scatterplot with logit transformation for age}
 #If you want the y-axis to be expressed as a proportion
@@ -91,7 +61,7 @@ lines(0:100,preds.age$ci.lb,lty="dashed")
 lines(0:100,preds.age$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies.logit$age[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies.logit$age[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot with logit transformation for age}
 #If you want the y-axis to be expressed as a logit event rate
@@ -104,7 +74,7 @@ lines(0:100,preds.age$ci.lb,lty="dashed")
 lines(0:100,preds.age$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies.logit$age[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies.logit$age[ids],ies.logit$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Calculating individual effect sizes with double arcsine transformation}
 ies.da=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
@@ -124,7 +94,7 @@ lines(0:40,preds.month$ci.lb,lty="dashed")
 lines(0:40,preds.month$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(3)
-text(ies.da$month[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies.da$month[ids],transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot with double arcsine transformation for month}
 #If you want the y-axis to be expressed as a double arcsine transformed proportion
@@ -137,5 +107,5 @@ lines(0:40,preds.month$ci.lb,lty="dashed")
 lines(0:40,preds.month$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(3)
-text(ies.da$month[ids], transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies.da$month[ids],ies.da$yi[ids],ids,cex=0.9,pos=pos)
 ```

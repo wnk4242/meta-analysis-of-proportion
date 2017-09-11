@@ -41,7 +41,7 @@ lines(0:40,preds.mod1$ci.lb,lty="dashed")
 lines(0:40,preds.mod1$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies$moderator1[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Calculating individual effect sizes with logit transformation}
 ies=escalc(xi=cases,ni=total,measure="PLO",data=dat)
@@ -61,7 +61,7 @@ lines(0:40,preds.mod1$ci.lb,lty="dashed")
 lines(0:40,preds.mod1$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies$moderator1[ids],transf.ilogit(ies$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot with logit transformed data}
 #If you want the y-axis to be expressed as a logit event rate
@@ -74,7 +74,7 @@ lines(0:40,preds.mod1$ci.lb,lty="dashed")
 lines(0:40,preds.mod1$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(1)
-text(ies$moderator1[ids], transf.ilogit(ies$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies$moderator1[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Calculating individual effect sizes with Freeman-Tukey double arcsine transformation}
 ies=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
@@ -94,7 +94,7 @@ lines(0:40,preds.mod1$ci.lb,lty="dashed")
 lines(0:40,preds.mod1$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(3)
-text(ies$moderator1[ids], transf.ipft.hm(ies$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies$moderator1[ids],transf.ipft.hm(ies$yi,targ=list(ni=dat$total))[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot with double arcsine transformed data}
 #If you want the y-axis to be expressed as a double arcsine transformed proportion
@@ -107,5 +107,5 @@ lines(0:40,preds.mod1$ci.lb,lty="dashed")
 lines(0:40,preds.mod1$ci.ub,lty="dashed")
 ids=c(1:6)
 pos=c(3)
-text(ies$moderator1[ids], transf.ipft.hm(ies$yi,targ=list(ni=dat$total))[ids], ids, cex=0.9, pos=pos)
+text(ies$moderator1[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```

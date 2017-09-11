@@ -146,7 +146,7 @@ lines(0:2,preds.stutype$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.stutype$ci.ub,lty="dashed",col="maroon")
 ids=c(1:6)
 pos=c(2)
-text(ies.logit$stutype[ids], transf.ilogit(ies.logit$yi)[ids], ids, cex=0.9, pos=pos)
+text(ies.logit$stutype[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for sample size}
 subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="REML")
@@ -157,7 +157,9 @@ plot(ies.logit$size,ies.logit$yi,cex=size,pch=1,las=1,xlab="Sample size", ylab="
 lines(0:2,preds.size$pred,col="navy")
 lines(0:2,preds.size$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.size$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
 pos=c(2)
+text(ies.logit$size[ids],ies.logit$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
@@ -166,14 +168,12 @@ funnel(pes.logit,yaxis="sei")
 #funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
 ```
 ```{r Trim and fill plot}
-pes
 pes.trimfill=trimfill(pes.logit)
-predict(pes.trimfill,transf=transf.ilogit,digits=5)
-pes.trimfill
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
 funnel(pes.trimfill)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
 #funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
+predict(pes.trimfill,transf=transf.ilogit)
 ```
 ```{r Egger's regression test}
 regtest(pes.logit,model="lm",predictor="sei")

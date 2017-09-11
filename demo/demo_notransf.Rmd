@@ -120,6 +120,9 @@ plot(ies$prov,ies$yi,cex=size,pch=1,las=1,xlab="Province", ylab="Proportion")
 lines(0:2,preds.prov$pred,col="navy")
 lines(0:2,preds.prov$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.prov$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(1)
+text(ies$prov[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 funnel(pes)
@@ -127,6 +130,7 @@ funnel(pes)
 ```{r Trim and fill plot}
 pes.trimfill=trimfill(pes)
 funnel(pes.trimfill)
+print(pes.trimfill)
 ```
 ```{r Egger's regression test}
 regtest(pes,model="lm",predictor="sei")
@@ -137,4 +141,3 @@ ranktest(pes)
 ```{r Failsafe N test}
 fsn(yi,vi,data=ies)
 ```
-

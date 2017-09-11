@@ -136,6 +136,9 @@ plot(ies.da$proced,ies.da$yi,cex=size,pch=1,las=1,xlab="Procedure", ylab="Double
 lines(0:2,preds.proced$pred,col="navy")
 lines(0:2,preds.proced$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.proced$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(3)
+text(ies.da$proced[ids],ies.da$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for procedure}
 #If you want the y-axis to be expressed as a proportion
@@ -147,6 +150,9 @@ plot(ies.da$proced,transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total)),cex=size,pc
 lines(0:2,preds.proced$pred,col="navy")
 lines(0:2,preds.proced$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.proced$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(3)
+text(ies.da$proced[ids],transf.ipft.hm(ies.da$yi,targ=list(ni=dat$total))[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 #If you want the x-axis to be expressed as a double arcsine transformed proportion, then remove the "#" sign before the following line.
@@ -160,8 +166,7 @@ pes.trimfill=trimfill(pes.da)
 #funnel(pes.trimfill)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
 funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
-pes.adjusted=predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
-print(pes.adjusted,digits=4)
+predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
 ```
 ```{r Egger's regression test with double arcsine transformation}
 regtest(pes.da,model="lm",predictor="sei")
@@ -172,9 +177,3 @@ ranktest(pes.da)
 ```{r Failsafe N test}
 fsn(yi,vi,data=ies.da)
 ```
-
-
-
-
-
-

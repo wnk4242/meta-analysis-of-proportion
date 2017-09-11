@@ -15,7 +15,7 @@ pes.transf=rma(yi,vi,data=ies,method="DL",weighted=TRUE)
 pes=predict(pes.transf,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes);print(pes.transf);confint(pes.transf)
 ```
-```{r Calculating subgroup summary proportions according to procedure}
+```{r Calculating subgroup summary proportions according to moderator a}
 pes.transf.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
 pes.transf.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
 pes.mal1=predict(pes.transf.mal1,transf=transf.ipft.hm,targ=list(ni=dat$total))
@@ -120,21 +120,33 @@ dat.diffvar= data.frame(estimate=c(pes.transf.mal1$b, pes.transf.mal2$b),stderro
 subganal.moderatora=rma(estimate, sei=stderror, mods = ~ moderatora, method="FE", data=dat.diffvar)
 print(subganal.moderatora)
 ```
-```{r Meta-regression}
-metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
-print(metareg.mod1)
-```
-```{r Scatterplot}
+```{r Scatterplot for catergorical moderators}
+#If you want the y-axis to be expressed as a proportion
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="DL")
+preds.moda=predict(subganal.moda,newmods=c(0:2),transf=transf.ipft.hm,targ=list(ni=dat$total))
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-preds.mod1=predict(metareg.mod1,newmods=c(0:40),transf=transf.ipft.hm,targ=list(ni=dat$total))
-plot(ies$moderator1,transf.ipft.hm(ies$yi,targ=list(ni=dat$total)),cex=size,pch=20,xlab="Moderator 1", ylab="Proportion",las=1)
-lines(0:40,preds.mod1$pred)
-lines(0:40,preds.mod1$ci.lb,lty="dashed")
-lines(0:40,preds.mod1$ci.ub,lty="dashed")
+plot(ies$moda,transf.ipft.hm(ies$yi,targ=list(ni=dat$total)),cex=size,pch=1,las=1,xlab="Moderator A", ylab="Proportion")
+lines(0:2,preds.moda$pred,col="navy")
+lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
 ids=c(1:6)
 pos=c(3)
-text(ies$moderator1[ids],transf.ipft.hm(ies$yi,targ=list(ni=dat$total))[ids],ids,cex=0.9,pos=pos)
+text(ies$moda[ids],transf.ipft.hm(ies$yi,targ=list(ni=dat$total))[ids],ids,cex=0.9,pos=pos)
+```
+```{r Scatterplot for catergorical moderators}
+#If you want the y-axis to be expressed as a double arcsine transformed proportion
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="DL")
+preds.moda=predict(subganal.moda,newmods=c(0:2))
+wi=1/sqrt(ies$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+plot(ies$moda,ies$yi,cex=size,pch=1,las=1,xlab="Moderator A", ylab="Double arcsine transformed proportion")
+lines(0:2,preds.moda$pred,col="navy")
+lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(3)
+text(ies$moda[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 png("funnel.png",width=1000,height=1000)
@@ -152,8 +164,7 @@ png("trimfill.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
 funnel(pes.trimfill,atransf=transf.ipft.hm,targ=list(ni=dat$total),yaxis="sei",xlab="Proportion")
 dev.off()
-pes.trimfill=predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
-print(pes.trimfill)
+predict(pes.trimfill,transf=transf.ipft.hm,targ=list(ni=dat$total))
 ```
 ```{r Egger's regression test}
 regtest(pes.transf,model="lm",predictor="sei")
@@ -167,8 +178,3 @@ fsn(yi,vi,data=ies)
 ```{r Vevea and Hedges Weight-Function Model with double arcsine transformation}
 weightfunct(ies$yi,ies$vi,steps=0.05)
 ```
-
-
-
-
-

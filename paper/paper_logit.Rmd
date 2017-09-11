@@ -15,7 +15,7 @@ pes.transf=rma(yi,vi,data=ies,method="DL",weighted=TRUE)
 pes=predict(pes.transf,transf=transf.ilogit)
 print(pes);print(pes.transf);confint(pes.transf)
 ```
-```{r Calculating subgroup summary proportions according to study type}
+```{r Calculating subgroup summary proportions according to moderator a}
 pes.transf.mal1=rma(yi,vi,data=ies,subset=moderatora=="level1",method="DL")
 pes.transf.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
 pes.mal1=predict(pes.transf.mal1,transf=transf.ilogit)
@@ -122,23 +122,33 @@ dat.diffvar= data.frame(estimate=c(pes.transf.mal1$b, pes.transf.mal2$b),stderro
 subganal.moderatora=rma(estimate,sei=stderror,mods=~moderatora,method="FE",data=dat.diffvar)
 print(subganal.moderatora)
 ```
-```{r Meta-regression}
-#If you want to analyze two or more moderators: mods=~moderator1+moderator2+...
-metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
-print(metareg.mod1)
-```
-```{r Scatterplot}
-#Numerical values in the following code are for demonstration purposes only. You need to change these values according to your dataset.
+```{r Scatterplot for catergorical moderators}
+#If you want the y-axis to be expressed as a proportion
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="REML")
+preds.moda=predict(subganal.moda,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-preds.mod1=predict(metareg.mod1,newmods=c(0:40),transf=transf.ilogit)
-plot(ies$moderator1,transf.ilogit(ies$yi),cex=size,pch=1,xlab="Moderator 1",ylab="Proportion",las=1)
-lines(0:40,preds.mod1$pred)
-lines(0:40,preds.mod1$ci.lb,lty="dashed")
-lines(0:40,preds.mod1$ci.ub,lty="dashed")
+plot(ies$moda,transf.ilogit(ies$yi),cex=size,pch=1,las=1,xlab="Moderator A", ylab="Proportion")
+lines(0:2,preds.moda$pred,col="navy")
+lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
 ids=c(1:6)
-pos=c(1)
-text(ies$moderator1[ids],transf.ilogit(ies$yi)[ids],ids,cex=0.9,pos=pos)
+pos=c(2)
+text(ies$moda[ids],transf.ilogit(ies$yi)[ids],ids,cex=0.9,pos=pos)
+```
+```{r Scatterplot for catergorical moderators}
+#If you want the y-axis to be expressed as a logit event rate
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="REML")
+preds.moda=predict(subganal.moda,newmods=c(0:2))
+wi=1/sqrt(ies$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+plot(ies$moda,ies$yi,cex=moda,pch=1,las=1,xlab="Moderator A", ylab="Logit event rate")
+lines(0:2,preds.moda$pred,col="navy")
+lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
+ids=c(1:6)
+pos=c(2)
+text(ies$moda[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 png("funnel.png",width=1000,height=1000)
@@ -156,8 +166,7 @@ png("trimfill.png",width=1000,height=1000)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
 funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion")
 dev.off()
-pes.trimfill=predict(pes.trimfill,transf=transf.ilogit)
-print(pes.trimfill)
+predict(pes.trimfill,transf=transf.ilogit)
 ```
 ```{r Egger's regression test}
 regtest(pes.transf,model="lm",predictor="sei")
