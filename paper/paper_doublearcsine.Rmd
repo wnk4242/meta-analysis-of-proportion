@@ -41,7 +41,7 @@ print(inf);plot(inf)
 ```
 ```{r Removing outliers}
 ies.noutlier=escalc(xi=cases,ni=total,measure="PFT", data=dat[-c(23),],add=0)
-pes.transf.noutlier=rma(yi,vi,data=ies.noutlier,method="FE",weighted=TRUE)
+pes.transf.noutlier=rma(yi,vi,data=ies.noutlier,method="DL",weighted=TRUE)
 pes.noutlier=predict(pes.transf.noutlier,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.noutlier)
 ```

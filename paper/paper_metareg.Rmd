@@ -28,7 +28,7 @@ ies=escalc(xi=cases,ni=total,measure="PR",data=dat)
 ```
 ```{r Meta-regression}
 #If you want to select two or more moderators: mods=~ moderator1+ moderator2+ moderator3
-metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
+metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="DL",test="z")
 print(metareg.mod1)
 ```
 ```{r Scatterplot}
@@ -47,7 +47,7 @@ text(ies$moderator1[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ies=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 ```
 ```{r Meta-regression with logit transformation}
-metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
+metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="DL",test="z")
 print(metareg.mod1)
 ```
 ```{r Scatterplot with logit transformed data}
@@ -80,7 +80,7 @@ text(ies$moderator1[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ies=escalc(measure="PFT",xi=cases,ni=total,data=dat, add=0)
 ```
 ```{r Meta-regression with double arcsine transformation}
-metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="REML",test="z")
+metareg.mod1=rma(yi,vi,data=ies,mods=~moderator1,method="DL",test="z")
 print(metareg.mod1)
 ```
 ```{r Scatterplot with double arcsine transformed data}
