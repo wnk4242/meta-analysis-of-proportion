@@ -124,11 +124,11 @@ print(subganal.moderatora)
 ```
 ```{r Scatterplot for catergorical moderators}
 #If you want the y-axis to be expressed as a proportion
-subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="REML")
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="DL")
 preds.moda=predict(subganal.moda,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies$moda,transf.ilogit(ies$yi),cex=size,pch=1,las=1,xlab="Moderator A", ylab="Proportion")
+plot(ies$moda,transf.ilogit(ies$yi),cex=size,pch=1,las=1,xlab="Moderator A",ylab="Proportion")
 lines(0:2,preds.moda$pred,col="navy")
 lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
@@ -138,11 +138,11 @@ text(ies$moda[ids],transf.ilogit(ies$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for catergorical moderators}
 #If you want the y-axis to be expressed as a logit event rate
-subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="REML")
+subganal.moda=rma(yi,vi,data=ies,mods=~moda,method="DL")
 preds.moda=predict(subganal.moda,newmods=c(0:2))
 wi=1/sqrt(ies$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies$moda,ies$yi,cex=moda,pch=1,las=1,xlab="Moderator A", ylab="Logit event rate")
+plot(ies$moda,ies$yi,cex=size,pch=1,las=1,xlab="Moderator A",ylab="Logit event rate")
 lines(0:2,preds.moda$pred,col="navy")
 lines(0:2,preds.moda$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.moda$ci.ub,lty="dashed",col="maroon")
