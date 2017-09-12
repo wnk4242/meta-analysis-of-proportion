@@ -6,7 +6,6 @@ library(metafor)
 library(meta)
 ```
 ```{r Reading in data}
-setwd("D:/data")
 dat=read.csv("data.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
@@ -42,6 +41,7 @@ print(pes.noutlier)
 ```
 ```{r Forest plot using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
+png("forestplot.png",width=1000,height=1000)
 forest(pes,
        slab=paste(dat$author, dat$year, sep=", "),
        ilab=cbind(data=dat$cases, dat$total),
@@ -66,6 +66,7 @@ text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subtotal(Q = ",.(formatC(pes.gua
 text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p),", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
 addpoly(pes.guangdong,row=11.4,cex=0.8,font=1,mlab="",digits=3)
 addpoly(pes.guangxi,row=1.1,cex=0.8, font=1,mlab="",digits=3)
+dev.off()
 ```
 ```{r Forest plot using metaprop}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
