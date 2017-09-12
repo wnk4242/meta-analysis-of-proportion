@@ -5,7 +5,6 @@ install.packages(c("metafor","meta","weightr"))
 library(metafor)
 library(meta)
 library(weightr)
-library(knitr)
 ```
 ```{r Reading in data}
 dat=read.csv("data.csv",header=T,sep=",")
