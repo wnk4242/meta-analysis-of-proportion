@@ -31,7 +31,7 @@ leave1out(pes)
 ```{r Baujat plot}
 baujat(pes)
 ```
-```{r Diagnostic tests with logit transformation}
+```{r Diagnostic tests}
 inf=influence(pes)
 print(inf);plot(inf)
 ```

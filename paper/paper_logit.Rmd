@@ -32,10 +32,10 @@ stud.res[order(-abs.z)]
 pes.leave1out=leave1out(pes.transf,transf=transf.ilogit)
 print(pes.leave1out)
 ```
-```{r Baujat plot with logit transformation}
+```{r Baujat plot}
 baujat(pes.transf)
 ```
-```{r Diagnostic tests with logit transformation}
+```{r Diagnostic tests}
 inf=influence(pes.transf)
 print(inf);plot(inf)
 ```
@@ -43,7 +43,7 @@ print(inf);plot(inf)
 ies.noutlier=escalc(xi=cases,ni=total,measure="PLO", data=dat[-c(2,3),])
 pes.transf.noutlier=rma(yi,vi,data=ies.noutlier,method="DL",weighted=TRUE)
 pes.noutlier=predict(pes.transf.noutlier,transf=transf.ilogit)
-print(pes.noutlier,digits=5)
+print(pes.noutlier)
 ```
 ```{r Forest plot with logit transformation using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
