@@ -20,6 +20,11 @@ pes.mal2=rma(yi,vi,data=ies,subset=moderatora=="level2",method="DL")
 print(pes.mal1);confint(pes.mal1)
 print(pes.mal2);confint(pes.mal2)
 ```
+```{r Identifying outliers with residuals}
+stud.res=rstudent(pes)
+abs.z=abs(stud.res$z)
+stud.res[order(-abs.z)]
+```
 ```{r Leave-one-out analysis}
 leave1out(pes)
 ```
