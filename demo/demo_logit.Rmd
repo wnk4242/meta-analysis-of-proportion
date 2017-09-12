@@ -81,9 +81,9 @@ dev.off()
 ```
 ```{r Forest plot using meta}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-pes.forest=metaprop(cases,total,authoryear,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot_meta.png",width=700,height=600)
-forest(pes.forest,
+forest(pes.summary,
        xlim = c(0,0.005), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
        rightlabs=c("Proportion", "95% C.I.","Weights"),

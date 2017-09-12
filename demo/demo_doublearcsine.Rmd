@@ -83,9 +83,9 @@ abline(h=-2)
 dev.off()
 ```
 ```{r Forest plot using metaprop}
-pes.forest=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.summary=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=1000,height=1000)
-forest(pes.forest,
+forest(pes.summary,
        xlim = c(0,0.5), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
        rightlabs=c("Proportion", "95% C.I.","Weights"),
