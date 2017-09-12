@@ -11,7 +11,7 @@ dat=read.csv("data.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
-pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE, slab=paste(author, year, sep=", "))
+pes=rma(yi,vi,data=ies,method="DL",weighted=TRUE)
 print(pes,digits=3);confint(pes)
 ```
 ```{r Calculating subgroup summary proportions according to province}
@@ -43,6 +43,7 @@ print(pes.noutlier)
 ```{r Forest plot using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
 forest(pes,
+       slab=paste(dat$author, dat$year, sep=", "),
        ilab=cbind(data=dat$cases, dat$total),
        ilab.xpos=c(-0.8, -0.4),
        rows=c(25:13,7.6:2.6),
