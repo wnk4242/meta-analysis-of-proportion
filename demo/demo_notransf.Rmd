@@ -41,7 +41,7 @@ print(pes.noutlier)
 ```
 ```{r Forest plot using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-png("forestplot.png",width=1000,height=1000)
+png("forestplot.png",width=500,height=500)
 forest(pes,
        slab=paste(dat$author, dat$year, sep=", "),
        ilab=cbind(data=dat$cases, dat$total),
@@ -60,8 +60,8 @@ forest(pes,
 text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")
 text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))
 text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
-text(1.65,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
-text(-2,-1.1,pos=4,cex=0.8,font=1,bquote(paste("All studies(Q = ",.(formatC(pes$QE, digits=1, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes$I2, digits=1, format="f")), "%",")")))
+text(1.25,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
+text(-2,-1,pos=4,cex=0.8,font=1,bquote(paste("               (Q = ",.(formatC(pes$QE, digits=1, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes$I2, digits=1, format="f")), "%",")")))
 text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangdong$QE, digits=1, format="f")), ", df = ", .(pes.guangdong$k - pes.guangdong$p),", p = ", .(formatC(pes.guangdong$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangdong$I2, digits=1, format="f")), "%",")")))
 text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p),", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
 addpoly(pes.guangdong,row=11.4,cex=0.8,font=1,mlab="",digits=3)
