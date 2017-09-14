@@ -7,7 +7,7 @@ library(meta)
 library(weightr)
 ```
 ```{r Reading in data}
-dat=read.csv("data.csv",header=T,sep=",")#When this rmd file is created in a R project, the default directory is the path to the current folder
+dat=read.csv("data.csv",header=T,sep=",")#When this rmd file is created in a R project, the default directory is the path to the current folder/note that when data is imported into r, if your column names contain letters in uppercase, they will be converted to lowercase, which means you are not able to use uppercase/lowercase letters to distinguish two columns. You need to use different words to distinguish them. In additions, you cannot place a blank in between two words. For instance, the correct form for column names should be: worldregion instead of world region. 
 ```
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
