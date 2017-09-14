@@ -1,13 +1,14 @@
 ```{r Installing required packages}
-install.packages(c("metafor","meta","weightr"))#Already installed
+install.packages(c("metafor","meta","weightr"))#Already installed#When you use knitr,delete this chunk
 ```
 ```{r Loading packages}
+library(knitr)
 library(metafor)
 library(meta)
 library(weightr)
 ```
 ```{r Reading in data}
-dat=read.csv("data.csv",header=T,sep=",")
+dat=read.csv("D:/data/data.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
@@ -175,8 +176,8 @@ funnel(pes.trimfill)
 #funnel(pes.trimfill,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
 predict(pes.trimfill,transf=transf.ilogit)
 ```
-```{r Egger's regression test}
-regtest(pes.logit,model="lm",predictor="sei")
+```{r Eggers regression test}
+regtest(pes.logit,model="lm",predictor="sei")#warning: when using knitr, "'" in Egger's should be deleted
 ```
 ```{r Rank correlation}
 ranktest(pes.logit)
