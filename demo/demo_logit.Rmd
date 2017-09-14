@@ -1,14 +1,13 @@
 ```{r Installing required packages}
-install.packages(c("metafor","meta","weightr"))#Already installed#When you use knitr,delete this chunk
+install.packages(c("metafor","meta","weightr"))#When you use knitr,delete this chunk
 ```
 ```{r Loading packages}
-library(knitr)
 library(metafor)
 library(meta)
 library(weightr)
 ```
 ```{r Reading in data}
-dat=read.csv("D:/data/data.csv",header=T,sep=",")
+dat=read.csv("data.csv",header=T,sep=",")#When this rmd file is created in a R project, the default directory is the path to the current folder
 ```
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
