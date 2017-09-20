@@ -7,7 +7,7 @@ library(meta)
 library(weightr)
 ```
 ```{r Reading in data}
-dat=read.csv("data.csv",header=T,sep=",")
+dat=read.csv("D:/data/data.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
@@ -58,21 +58,23 @@ forest(ies.summary$yi,
        rows=c(19:14, 8.5:-1.5),
        at=c(seq(from=0,to=0.004,by=0.001)), 
        refline=pes$pred,
-       ylim=c(-5,24),
+       ylim=c(-5,23),
        xlim=c(-0.005,0.005),
+       pch=21,
+       bg="grey",
        cex=1,
        font=1,
        main="Effect size by study type (RE Model)",
        xlab="Proportion",
        digits=4
        )
-text(-0.005,23,pos=4,cex=1.2,font=9,"Author, Year")
-text(c(-0.0022,-0.0012),23,pos=4,cex=1.2,font=9,c("Cases", "Total"))
-text(0.003,23,pos=4,cex=1.2,font=9,"Proportion [95% CI]")
-text(-0.005,c(10,20.5),pos=4, cex=1.2,font=1,c("Others", "Birth Cohort"))
-addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,digits=5,cex=1.1,mlab="")
-addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,digits=5,cex=1.1,mlab="")
-addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,digits=5,cex=1.1,mlab="")
+text(-0.005,22,pos=4,cex=1.2,font=9,"Author, Year")
+text(c(-0.0022,-0.0012),22,pos=4,cex=1.2,font=9,c("Cases", "Total"))
+text(0.003,22,pos=4,cex=1.2,font=9,"Proportion [95% CI]")
+text(-0.005,c(9.7,20.2),pos=4, cex=1.2,font=1,c("Others", "Birth Cohort"))
+addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,col="grey",digits=5,cex=1.1,mlab="")
+addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,col="grey",digits=5,cex=1.1,mlab="")
+addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,col="grey",digits=5,cex=1.1,mlab="")
 text(-0.005,-5,pos=4,cex=1.1,bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1,format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
 text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.birthcohort$QE, digits=1, format="f")), ", df = ", .(pes.logit.birthcohort$k - pes.logit.birthcohort$p),", p = ", .(formatC(pes.logit.birthcohort$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.birthcohort$I2, digits=1, format="f")), "%",")")))
 text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
