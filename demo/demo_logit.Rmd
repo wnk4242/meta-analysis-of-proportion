@@ -48,7 +48,7 @@ print(pes.noutlier,digits=5)
 ```
 ```{r Forest plot using metafor}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-png("forestplot_metafor.png",width=750,height=700)
+png("forestplot.png",width=730,height=700)
 ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
@@ -68,9 +68,9 @@ forest(ies.summary$yi,
        xlab="Proportion",
        digits=4
        )
-text(-0.005,22,pos=4,cex=1.2,font=9,"Author, Year")
-text(c(-0.0022,-0.0012),22,pos=4,cex=1.2,font=9,c("Cases", "Total"))
-text(0.003,22,pos=4,cex=1.2,font=9,"Proportion [95% CI]")
+text(-0.005,22,pos=4,cex=1.2,font=1,"Author, Year")
+text(c(-0.0023,-0.0013),22,pos=4,cex=1.2,font=1,c("Cases", "Total"))
+text(0.003,22,pos=4,cex=1.2,font=1,"Proportion [95% CI]")
 text(-0.005,c(9.7,20.2),pos=4, cex=1.2,font=1,c("Others", "Birth Cohort"))
 addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,col="grey",digits=5,cex=1.1,mlab="")
 addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,col="grey",digits=5,cex=1.1,mlab="")
@@ -84,7 +84,7 @@ dev.off()
 ```{r Forest plot using meta}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
 pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot_meta.png",width=700,height=600)
+png("forestplot.png",width=700,height=600)
 forest(pes.summary,
        xlim = c(0,0.005), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
