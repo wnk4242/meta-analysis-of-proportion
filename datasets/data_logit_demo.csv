@@ -1,4 +1,4 @@
-author,year,authoryear,cases,total,worldregion,region,researchperiod,period,agediagnosed,age,samplesize,size,studytype,stutype
+author,year,authoryear,cases,total,worldregion,region,researchperiod,period,agediagnosed,age,samplesize,size,studydesign,studesg
 Stewart-Brown,1988,Stewart-Brown 1988,7,12853,Other countries,1,Before,1,Older than 1,1,Less than 100000,1,Birth cohort,1
 Bermejo,1998,Bermejo 1998,71,1124654,Other countries,1,Before,1,Younger than 1,2,More than 100000,2,Birth cohort,1
 SanGiovanni,2002,SanGiovanni 2002,73,53639,Other countries,1,Before,1,Older than 1,1,Less than 100000,1,Birth cohort,1
