@@ -8,6 +8,7 @@ library(meta)
 ```{r Reading in data}
 setwd("D:/data")
 dat=read.csv("data.csv",header=T,sep=",")
+table(dat)
 ```
 ```{r Calculating overall summary proportion}
 ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)

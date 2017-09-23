@@ -16,8 +16,8 @@ pes=predict(pes.logit,transf=transf.ilogit,digits=5)
 print(pes,digits=5);print(pes.logit,digits=4);confint(pes.logit,digits=2)
 ```
 ```{r Calculating subgroup summary proportions according to study type}
-pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studytype=="Birth cohort",method="DL")
-pes.logit.others=rma(yi,vi,data=ies.logit,subset=studytype=="Others",method="DL")
+pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="DL")
+pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="DL")
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
 print(pes.birthcohort,digits=5);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
@@ -83,7 +83,7 @@ dev.off()
 ```
 ```{r Forest plot using meta}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studytype,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studydesign,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=700,height=600)
 forest(pes.summary,
        xlim = c(0,0.005), pscale =1, 
@@ -122,33 +122,33 @@ subganal.worldregion=rma(yi,vi,data=ies.logit,mods=~worldregion,method="REML")
 subganal.researchperiod=rma(yi,vi,data=ies.logit,mods=~researchperiod,method="REML")
 subganal.agediagnosed=rma(yi,vi,data=ies.logit,mods=~agediagnosed,method="REML")
 subganal.samplesize=rma(yi,vi,data=ies.logit,mods=~samplesize,method="REML")
-subganal.studytype=rma(yi,vi,data=ies.logit,mods=~studytype,method="DL")
+subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
 subganal.periodagesize=rma(yi,vi,data=ies.logit,mods=~researchperiod+agediagnosed+samplesize,method="REML")
 print(subganal.worldregion,digits=4)
 print(subganal.researchperiod,digits=4)
 print(subganal.agediagnosed,digits=4)
 print(subganal.samplesize,digits=4)
-print(subganal.studytype,digits=4)
+print(subganal.studydesign,digits=4)
 print(subganal.periodagesize,digits=4)
 ```
 ```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
 #Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
-dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studytype = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studytype=rma(estimate,sei=stderror,mods=~studytype,method="FE",data=dat.diffvar)
-print(subganal.studytype,digits=2)
+dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studydesign = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
+subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
+print(subganal.studydesign,digits=2)
 ```
 ```{r Scatterplot for study type}
-subganal.stutype=rma(yi,vi,data=ies.logit,mods=~stutype,method="REML")
-preds.stutype=predict(subganal.stutype,newmods=c(0:2),transf=transf.ilogit)
+subganal.studesg=rma(yi,vi,data=ies.logit,mods=~studesg,method="REML")
+preds.studesg=predict(subganal.studesg,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies.logit$stutype,transf.ilogit(ies.logit$yi),cex=size,pch=1,las=1,xlab="Study Type", ylab="Proportion")
-lines(0:2,preds.stutype$pred,col="navy")
-lines(0:2,preds.stutype$ci.lb,lty="dashed",col="maroon")
-lines(0:2,preds.stutype$ci.ub,lty="dashed",col="maroon")
+plot(ies.logit$studesg,transf.ilogit(ies.logit$yi),cex=size,pch=1,las=1,xlab="Study Type", ylab="Proportion")
+lines(0:2,preds.studesg$pred,col="navy")
+lines(0:2,preds.studesg$ci.lb,lty="dashed",col="maroon")
+lines(0:2,preds.studesg$ci.ub,lty="dashed",col="maroon")
 ids=c(1:6)
 pos=c(2)
-text(ies.logit$stutype[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
+text(ies.logit$studesg[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for sample size}
 subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="REML")
