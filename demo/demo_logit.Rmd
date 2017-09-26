@@ -12,7 +12,7 @@ dat=read.csv("D:/data/data.csv",header=T,sep=",")
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
-pes=predict(pes.logit,transf=transf.ilogit,digits=5)
+pes=predict(pes.logit,transf=transf.ilogit)
 print(pes,digits=5);print(pes.logit,digits=4);confint(pes.logit,digits=2)
 ```
 ```{r Calculating subgroup summary proportions according to study type}
