@@ -13,7 +13,7 @@ dat=read.csv("D:/data/data.csv",header=T,sep=",")
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
 pes=predict(pes.logit,transf=transf.ilogit)
-print(pes,digits=5);print(pes.logit,digits=4);confint(pes.logit,digits=2)
+print(pes,digits=6);print(pes.logit,digits=4);confint(pes.logit,digits=2)
 ```
 ```{r Calculating subgroup summary proportions according to study type}
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="DL")
