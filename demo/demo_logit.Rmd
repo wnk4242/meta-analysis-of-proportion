@@ -85,12 +85,13 @@ dev.off()
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
 pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studydesign,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=700,height=600)
+prop=(dat$cases)/(dat$total)
 forest(pes.summary,
-       xlim = c(0,0.005), pscale =1, 
-       rightcols=c("effect", "ci","w.random"),
-       rightlabs=c("Proportion", "95% C.I.","Weights"),
-       leftcols = c("studlab", "event", "n"), 
-       leftlabs = c("Study", "Cases", "Total"),
+       sortvar=prop,
+       xlim = c(0,0.004), pscale =1, 
+       rightcols=FALSE,
+       leftcols = c("studlab", "event", "n","w.random","effect", "ci"), 
+       leftlabs = c("Study", "Cases", "Total","Weights","Proportion", "95% C.I."),
        xlab = "Prevalence", 
        fs.xlab=12,
        fs.study=12,
@@ -103,8 +104,8 @@ forest(pes.summary,
        lty.random=2, 
        type.study="square",
        type.random="diamond",
-       ff.fixed="bold.italic",
-       ff.random="bold.italic",
+       ff.fixed="bold",
+       ff.random="bold",
        hetlab = "Heterogeneity:",
        fs.hetstat=10,
        smlab="",
@@ -112,8 +113,8 @@ forest(pes.summary,
        print.pval.Q=TRUE,
        print.I2=TRUE,
        print.tau2=FALSE,
-       col.by="grey",
-       digits=5)
+       col.by="black",
+       digits=4)
 dev.off()
 ```
 ```{r Subgroup analysis assuming a common among-study variance component across subgroups}
