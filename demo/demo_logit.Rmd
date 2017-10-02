@@ -88,24 +88,22 @@ png("forestplot.png",width=700,height=600)
 prop=(dat$cases)/(dat$total)
 forest(pes.summary,
        sortvar=prop,
-       xlim = c(0,0.004), pscale =1, 
+       xlim = c(0,4), pscale =1000, #if proportions are too low, consider rescaling proportions
        rightcols=FALSE,
-       leftcols = c("studlab", "event", "n","w.random","effect", "ci"), 
-       leftlabs = c("Study", "Cases", "Total","Weights","Proportion", "95% C.I."),
-       xlab = "Prevalence", 
+       leftcols = c("studlab","effect", "ci"),#"event", "n","w.random" 
+       leftlabs = c("Study","Proportion", "95% C.I."),#"Cases", "Total","Weights"
+       xlab = "Proportion (‰)", 
        fs.xlab=12,
        fs.study=12,
        fs.study.lables=12,
        fs.heading=12,
        squaresize = 0.5, col.square="navy", col.square.lines="navy",
-       col.diamond="navy", col.diamond.lines="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",
        comb.fixed=FALSE,
-       lty.fixed=0,
-       lty.random=2, 
+       lty.random=2, #lty.fixed=0,
        type.study="square",
        type.random="diamond",
-       ff.fixed="bold",
-       ff.random="bold",
+       ff.random="bold", #ff.fixed="bold",
        hetlab = "Heterogeneity:",
        fs.hetstat=10,
        smlab="",
@@ -114,7 +112,8 @@ forest(pes.summary,
        print.I2=TRUE,
        print.tau2=FALSE,
        col.by="black",
-       digits=4)
+       digits=2,
+       digits.Q=0)
 dev.off()
 ```
 ```{r Subgroup analysis assuming a common among-study variance component across subgroups}
