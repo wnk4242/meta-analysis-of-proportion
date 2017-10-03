@@ -15,13 +15,13 @@ pes.logit=rma(yi,vi,data=ies.logit,method="DL",weighted=TRUE)
 pes=predict(pes.logit,transf=transf.ilogit)
 print(pes,digits=6);print(pes.logit,digits=4);confint(pes.logit,digits=2)
 ```
-```{r Calculating subgroup summary proportions according to study type}
-pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="DL")
-pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="DL")
+```{r Calculating subgroup summary proportions according to study design}
+pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="REML")
+pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="REML")
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
-print(pes.birthcohort,digits=5);print(pes.logit.birthcohort,digits=2);confint(pes.logit.birthcohort,digits=2)
-print(pes.others,digits=5);print(pes.logit.others,digits=2);confint(pes.logit.others,digits=2)
+print(pes.birthcohort,digits=5);print(pes.logit.birthcohort,digits=5);confint(pes.logit.birthcohort,digits=5)
+print(pes.others,digits=5);print(pes.logit.others,digits=5);confint(pes.logit.others,digits=5)
 ```
 ```{r Identifying outliers with residuals}
 stud.res=rstudent(pes.logit)
@@ -33,7 +33,7 @@ pes.leave1out=leave1out(pes.logit,transf=transf.ilogit)
 print(pes.leave1out,digits=5)
 ```
 ```{r Baujat plot}
-baujat(pes.logit)
+baujat(pes.logit,xlab="Contribution to Q-statistic", ylab="Influence on Summary Proportion")
 ```
 ```{r Diagnostic tests}
 inf=influence(pes.logit)
@@ -122,7 +122,7 @@ subganal.worldregion=rma(yi,vi,data=ies.logit,mods=~worldregion,method="REML")
 subganal.researchperiod=rma(yi,vi,data=ies.logit,mods=~researchperiod,method="REML")
 subganal.agediagnosed=rma(yi,vi,data=ies.logit,mods=~agediagnosed,method="REML")
 subganal.samplesize=rma(yi,vi,data=ies.logit,mods=~samplesize,method="REML")
-subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
+subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="REML")
 subganal.periodagesize=rma(yi,vi,data=ies.logit,mods=~researchperiod+agediagnosed+samplesize,method="REML")
 print(subganal.worldregion,digits=4)
 print(subganal.researchperiod,digits=4)
@@ -132,10 +132,31 @@ print(subganal.studydesign,digits=4)
 print(subganal.periodagesize,digits=4)
 ```
 ```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
+#Separate Meta-Analyses
 #Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
-dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),studydesign = c("Birth cohort","Others"), tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
+dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
+                       stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),
+                       studydesign=c("Birth cohort","Others"), 
+                       tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
 subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
-print(subganal.studydesign,digits=2)
+print(dat.diffvar)
+print(subganal.studydesign,digits=4)
+```
+```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
+#Separate Meta-Analyses
+#This chunk can get exactly the same results as above
+dat.diffvar=data.frame(estimate=c(coef(pes.logit.birthcohort),coef(pes.logit.others)), 
+                       stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),
+                       meta=c("Birth cohort","Others"),
+                       tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
+subganal.studydesign=rma(estimate,sei=stderror,mods=~meta,method="FE",data=dat.diffvar)
+print(dat.diffvar)
+print(subganal.studydesign,digits=4)
+```
+```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
+#Separate Meta-Analyses
+#This chunk can get exactly the same results as above
+rma.mv(yi,vi,mods=~studydesign,random =~studydesign|author,struct="DIAG",data=ies.logit,digits=5)
 ```
 ```{r Scatterplot for study type}
 subganal.studesg=rma(yi,vi,data=ies.logit,mods=~studesg,method="REML")
