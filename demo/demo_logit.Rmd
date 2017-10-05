@@ -144,6 +144,8 @@ print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
 ```
 ```{r Scatterplot for study design}
+#Assuming a common between-study variance component across subgroups
+#0.3452 is the coeffecient for the study design moderator;the pvals of QM and zval indicate this moderator is not significant
 subganal.studesg=rma(yi,vi,data=ies.logit,mods=~studesg,method="DL")
 preds.studesg=predict(subganal.studesg,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies.logit$vi)
