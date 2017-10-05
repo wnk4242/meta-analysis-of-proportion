@@ -110,7 +110,11 @@ dev.off()
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
 #Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 yielded by pooling 0.93224 and 0.24743
-#to create multivariate model:subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
+#Residual heterogeneity is heterogeneity not explained by the covariat. The results of the Test for Residual Heterogeneity show that there is significant unexplained variance left between all effect sizes in the dataset, which can explain why R^2 show 0%
+#The category that is coded as 0 (ie Birth cohort) will become the reference category (represented by the intercept).The other category coded as 1 (ie Others) will be compared with the reference category.
+#The value of the intercept is the logit-transformed summary(mean) effect size of the studies in the reference category (ie Birth cohort)
+#The summary effect size of the studies in the other category(ie Others) equals to -7.9742+0.3452=-7.629
+#To create multivariate model:subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
 subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,mods=~studydesign=="Others",method="DL")
 pes.logit.others=rma(yi,vi,data=ies.logit,mods=~studydesign=="Birth cohort",method="DL")
