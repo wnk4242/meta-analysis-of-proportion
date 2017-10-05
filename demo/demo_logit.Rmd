@@ -110,19 +110,21 @@ dev.off()
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion}
 #Assuming a common between-study variance component across subgroups
-#Pool within-group estimates of tau-squared (between-study variance):0.4427 is the pooled value of tau^2
+#Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 resulting from by pooling 0.93224 and 0.24743
+#to create multivariate model:subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
 subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
-pes.logit.subg=predict(subganal.studydesign)
+pes.logit.birthcohort=subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign=="Others",method="DL")
+pes.logit.others=subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign=="Birth cohort",method="DL")
 pes.subg=predict(subganal.studydesign,transf=transf.ilogit)
-dat.samevar=data.frame(estimate=c(pes.logit.subg[1]$pred,pes.logit.subg[17]$pred),
-                       stderror=c(pes.logit.subg[1]$se,pes.logit.subg[17]$se),
+dat.samevar=data.frame(estimate=c((pes.logit.birthcohort$b)[1],(pes.logit.others$b)[1]),
+                       stderror=c((pes.logit.birthcohort$se)[1],(pes.logit.others$se)[1]),
                        tau2=subganal.studydesign$tau2)
 pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.samevar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
+#print(pes.subg[order(pes.subg$pred)],digits=6)
 print(subganal.studydesign,digits=4)
 print(pes.subg[1],digits=6);print(pes.subg[17],digits=6)
 print(pes.studydesign,digits=6)
-#subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
 ```
 ```{r Calculating subgroup summary proportions}
 #Separate Meta-Analyses: not assuming a common between-study variance component across subgroups
