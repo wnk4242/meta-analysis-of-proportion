@@ -108,36 +108,29 @@ forest(pes.summary,
        digits.Q=0)
 dev.off()
 ```
-```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion}
-#Assuming a common between-study variance component across subgroups
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
 #Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 resulting from by pooling 0.93224 and 0.24743
 #to create multivariate model:subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
 subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
-pes.logit.birthcohort=subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign=="Others",method="DL")
-pes.logit.others=subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign=="Birth cohort",method="DL")
-pes.subg=predict(subganal.studydesign,transf=transf.ilogit)
+pes.logit.birthcohort=rma(yi,vi,data=ies.logit,mods=~studydesign=="Others",method="DL")
+pes.logit.others=rma(yi,vi,data=ies.logit,mods=~studydesign=="Birth cohort",method="DL")
+pes.subg.studydesign=predict(subganal.studydesign,transf=transf.ilogit)
 dat.samevar=data.frame(estimate=c((pes.logit.birthcohort$b)[1],(pes.logit.others$b)[1]),
                        stderror=c((pes.logit.birthcohort$se)[1],(pes.logit.others$se)[1]),
                        tau2=subganal.studydesign$tau2)
 pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.samevar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
-#print(pes.subg[order(pes.subg$pred)],digits=6)
+#print(pes.subg.studydesign[order(pes.subg.studydesign$pred)],digits=6)
 print(subganal.studydesign,digits=4)
-print(pes.subg[1],digits=6);print(pes.subg[17],digits=6)
+print(pes.subg.studydesign[1],digits=6);print(pes.subg.studydesign[17],digits=6)
 print(pes.studydesign,digits=6)
 ```
-```{r Calculating subgroup summary proportions}
-#Separate Meta-Analyses: not assuming a common between-study variance component across subgroups
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common between-study variance component across subgroups}
+#Do not pool within-group estimates of tau-squared
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="DL")
 pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="DL")
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
-print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=5);confint(pes.logit.birthcohort,digits=5)
-print(pes.others,digits=6);print(pes.logit.others,digits=5);confint(pes.logit.others,digits=5)
-```
-```{r Conducting subgroup analysis and recalculating summary proportion}
-#Separate Meta-Analyses: not assuming a common between-study variance component across subgroups
-#Do not pool within-group estimates of tau-squared
 dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
                        stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),
                        studydesign=c("Birth cohort","Others"), 
@@ -145,21 +138,9 @@ dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
 subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
 pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.diffvar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
-print(dat.diffvar)
-print(subganal.studydesign,digits=4)
-print(pes.studydesign,digits=6)
-```
-```{r Conducting subgroup analysis not assuming a common between-study variance component across subgroups}
-#This chunk can get exactly the same results as above
-dat.diffvar=data.frame(estimate=c(coef(pes.logit.birthcohort),coef(pes.logit.others)), 
-                       stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),
-                       meta=c("Birth cohort","Others"),
-                       tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
-subganal.studydesign=rma(estimate,sei=stderror,mods=~meta,method="FE",data=dat.diffvar)
-pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.diffvar)
-pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
-print(dat.diffvar)
-print(subganal.studydesign,digits=4)
+print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=3);confint(pes.logit.birthcohort,digits=3)
+print(pes.others,digits=6);print(pes.logit.others,digits=3);confint(pes.logit.others,digits=3)
+print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
 ```
 ```{r Scatterplot for study type}
