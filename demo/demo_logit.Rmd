@@ -109,7 +109,7 @@ forest(pes.summary,
 dev.off()
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
-#Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 resulting from by pooling 0.93224 and 0.24743
+#Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 yielded by pooling 0.93224 and 0.24743
 #to create multivariate model:subganal.sizedesign=rma(yi,vi,data=ies.logit,mods=~samplesize+studydesign,method="DL")
 subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,mods=~studydesign=="Others",method="DL")
@@ -132,7 +132,7 @@ pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="D
 pes.birthcohort=predict(pes.logit.birthcohort,transf=transf.ilogit,digits=5)
 pes.others=predict(pes.logit.others,transf=transf.ilogit,digits=5)
 dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
-                       stderror=c(pes.logit.birthcohort$se, pes.logit.others$se),
+                       stderror=c(pes.logit.birthcohort$se,pes.logit.others$se),
                        studydesign=c("Birth cohort","Others"), 
                        tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
 subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
@@ -143,12 +143,12 @@ print(pes.others,digits=6);print(pes.logit.others,digits=3);confint(pes.logit.ot
 print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
 ```
-```{r Scatterplot for study type}
+```{r Scatterplot for study design}
 subganal.studesg=rma(yi,vi,data=ies.logit,mods=~studesg,method="DL")
 preds.studesg=predict(subganal.studesg,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies.logit$studesg,transf.ilogit(ies.logit$yi),cex=size,pch=1,las=1,xlab="Study Type", ylab="Proportion")
+plot(ies.logit$studesg,transf.ilogit(ies.logit$yi),cex=size,pch=1,las=1,xlab="Study Design", ylab="Proportion")
 lines(0:2,preds.studesg$pred,col="navy")
 lines(0:2,preds.studesg$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.studesg$ci.ub,lty="dashed",col="maroon")
