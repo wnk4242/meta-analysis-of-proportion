@@ -181,10 +181,6 @@ funnel(pes.logit,yaxis="sei")
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
 #funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
 ```
-```{r Contour-enhanced funnel plot}
-funnel(pes.logitlevel=c(90, 95, 99),shade=c("white", "gray", "darkgray"))
-```
-
 ```{r Trim and fill plot}
 pes.trimfill=trimfill(pes.logit)
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
