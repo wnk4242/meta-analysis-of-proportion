@@ -7,7 +7,7 @@ library(meta)
 library(weightr)
 ```
 ```{r Reading in data}
-dat=read.csv("D:/data/data.csv",header=T,sep=",")
+dat=read.csv("D:/data/data_logit.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
@@ -75,16 +75,17 @@ dev.off()
 ```
 ```{r Forest plot using meta}
 #If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studydesign,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
+pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studesg,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
 png("forestplot.png",width=700,height=600)
 prop=dat$cases/dat$total
+precison=sqrt(ies.logit$vi)
 forest(pes.summary,
-       sortvar=prop,
+       #sortvar=prop,
        xlim = c(0,4), pscale =1000, #if proportions are too low, consider rescaling proportions
        rightcols=FALSE,
        leftcols = c("studlab","effect", "ci"),#"event", "n","w.random" 
        leftlabs = c("Study","Proportion", "95% C.I."),#"Cases", "Total","Weights"
-       xlab = "Proportion (â€°)", 
+       xlab = "Proportion (¡ë)", 
        fs.xlab=12,
        fs.study=12,
        fs.study.lables=12,
@@ -104,7 +105,7 @@ forest(pes.summary,
        print.I2=TRUE,
        print.tau2=FALSE,
        col.by="black",
-       digits=2,
+       digits=4,
        digits.Q=0)
 dev.off()
 ```
@@ -125,11 +126,12 @@ dat.samevar=data.frame(estimate=c((pes.logit.birthcohort$b)[1],(pes.logit.others
 pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.samevar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
 #print(pes.subg.studydesign[order(pes.subg.studydesign$pred)],digits=6)
-print(subganal.studydesign,digits=4)
-print(pes.subg.studydesign[1],digits=6);print(pes.subg.studydesign[17],digits=6)
 print(pes.studydesign,digits=6)
+print(pes.subg.studydesign[1],digits=6);print(pes.subg.studydesign[17],digits=6)
+print(subganal.studydesign,digits=4)
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common between-study variance component across subgroups}
+#Calculating each subgroup summary proportion as an independent meta-analysis ignoring subgrouping
 #Do not pool within-group estimates of tau-squared
 pes.logit.birthcohort=rma(yi,vi,data=ies.logit,subset=studydesign=="Birth cohort",method="DL")
 pes.logit.others=rma(yi,vi,data=ies.logit,subset=studydesign=="Others",method="DL")
@@ -142,10 +144,11 @@ dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
 subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
 pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.diffvar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
-print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=3);confint(pes.logit.birthcohort,digits=3)
-print(pes.others,digits=6);print(pes.logit.others,digits=3);confint(pes.logit.others,digits=3)
+print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=3);confint(pes.logit.birthcohort,digits=5)
+print(pes.others,digits=6);print(pes.logit.others,digits=3);confint(pes.logit.others,digits=5)
 print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
+print(pes.logit.studydesign,digits=6)
 ```
 ```{r Scatterplot for study design}
 #Assuming a common between-study variance component across subgroups

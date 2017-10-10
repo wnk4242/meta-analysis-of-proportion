@@ -6,28 +6,15 @@ library(metafor)
 library(meta)
 ```
 ```{r Reading in data}
-setwd("D:/data")
-dat=read.csv("data.csv",header=T,sep=",")
-table(dat)
+dat=read.csv("D:/data/data_da.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
-pes.da=rma(yi,vi,data=ies.da,method="FE",weighted=TRUE)
+pes.da=rma(yi,vi,data=ies.da,method="DL",weighted=TRUE)
 pes=predict(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
-print(pes,digits=4);print(pes.da,digits=2)
 ##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
 ##pes=predict(pes.da,transf=transf.iarcsin)
-```
-```{r Calculating subgroup summary proportions according to procedure}
-pes.da.endoscopy=rma(yi,vi,data=ies.da,subset=procedure=="endoscopy",method="FE")
-pes.da.microscopy=rma(yi,vi,data=ies.da,subset=procedure=="microscopy",method="FE")
-pes.endoscopy=predict(pes.da.endoscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
-pes.microscopy=predict(pes.da.microscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
-print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2)
-print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2)
-##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
-##predict(pes.da.endoscopy,transf=transf.iarcsin)
-##predict(pes.da.microscopy,transf=transf.iarcsin)
+print(pes,digits=6);print(pes.da,digits=6)#Under fixed-effect model, confint () cannot be used.
 ```
 ```{r Identifying outliers with residuals}
 stud.res=rstudent(pes.da)
@@ -47,7 +34,7 @@ print(inf);plot(inf)
 ```
 ```{r Removing outliers}
 ies.da.noutlier=escalc(xi=cases,ni=total,measure="PFT", data=dat[-c(23),],add=0)
-pes.da.noutlier=rma(yi,vi,data=ies.da.noutlier,method="FE",weighted=TRUE)
+pes.da.noutlier=rma(yi,vi,data=ies.da.noutlier,method="DL",weighted=TRUE)
 pes.noutlier=predict(pes.da.noutlier,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes,digits=4)
 print(pes.noutlier,digits=4)
@@ -67,7 +54,7 @@ forest(ies.summary$yi,
        refline=pes$pred,
        cex=1,
        font=6,
-       main="Effect size by moderator a (FE model)",
+       main="Effect size by moderator a (DL model)",
        xlab="Proportion"
        )
 text(-2, 41,pos=4,cex=1,font=6,"Author(s), Year")
@@ -118,18 +105,48 @@ forest(pes.summary,
        digits=4)
 dev.off()
 ```
-```{r Subgroup analysis assuming a common among-study variance component across subgroups}
-subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="FE")
-print(subganal.procedure)
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
+#Pool within-group estimates of tau-squared
+subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="DL")
+pes.da.endoscopy=rma(yi,vi,data=ies.da,mods=~procedure=="microscopy",method="DL")
+pes.da.microscopy=rma(yi,vi,data=ies.da,mods=~procedure=="endoscopy",method="DL")
+pes.subg.procedure=predict(subganal.procedure,transf=transf.ipft.hm,targ=list(ni=dat$total))
+dat.samevar=data.frame(estimate=c((pes.da.endoscopy$b)[1],(pes.da.microscopy$b)[1]),
+                       stderror=c((pes.da.endoscopy$se)[1],(pes.da.microscopy$se)[1]),
+                       tau2=subganal.procedure$tau2)
+pes.da.procedure=rma(estimate,sei=stderror,method="DL",data=dat.samevar)
+pes.procedure=predict(pes.da.procedure,transf=transf.ipft.hm,targ=list(ni=dat$total))
+#print(pes.subg.procedure[order(pes.subg.procedure$pred)],digits=6)
+print(pes.procedure,digits=6)
+print(pes.subg.procedure[1],digits=6);print(pes.subg.procedure[29],digits=6)
+print(subganal.procedure,digits=4)
 ```
-```{r Subgroup analysis not assuming a common among-study variance component across subgroups}
-dat.diffvar= data.frame(estimate=c(pes.da.endoscopy$b, pes.da.microscopy$b),stderror=c(pes.da.endoscopy$se, pes.da.microscopy$se),procedure = c("endoscopy","microscopy"), tau2=round(c(pes.da.endoscopy$tau2, pes.da.microscopy$tau2),3))
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common between-study variance component across subgroups}
+#Calculating each subgroup summary proportion as an independent meta-analysis ignoring subgrouping
+#Do not pool within-group estimates of tau-squared
+pes.da.endoscopy=rma(yi,vi,data=ies.da,subset=procedure=="endoscopy",method="DL")
+pes.da.microscopy=rma(yi,vi,data=ies.da,subset=procedure=="microscopy",method="DL")
+pes.endoscopy=predict(pes.da.endoscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
+pes.microscopy=predict(pes.da.microscopy,transf=transf.ipft.hm,targ=list(ni=dat$total))
+dat.diffvar= data.frame(estimate=c(pes.da.endoscopy$b, pes.da.microscopy$b),
+                        stderror=c(pes.da.endoscopy$se, pes.da.microscopy$se),
+                        procedure = c("endoscopy","microscopy"), 
+                        tau2=round(c(pes.da.endoscopy$tau2, pes.da.microscopy$tau2),3))
 subganal.procedure=rma(estimate, sei=stderror, mods=~procedure, method="FE", data=dat.diffvar, digits=4)
-print(subganal.procedure)
+pes.da.procedure=rma(estimate, sei=stderror, method="DL", data=dat.diffvar, digits=4)
+pes.procedure=predict(pes.da.procedure,transf=transf.ipft.hm,targ=list(ni=dat$total))
+print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2)
+print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2)
+print(subganal.procedure,digits=2)
+print(pes.procedure,digits=6)
+print(pes.da.procedure,digits=2)
+##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
+##predict(pes.da.endoscopy,transf=transf.iarcsin)
+##predict(pes.da.microscopy,transf=transf.iarcsin)
 ```
 ```{r Scatterplot for procedure}
 #If you want the y-axis to be expressed as a double arcsine transformed proportion
-subganal.proced=rma(yi,vi,data=ies.da,mods=~proced,method="FE")
+subganal.proced=rma(yi,vi,data=ies.da,mods=~proced,method="DL")
 preds.proced=predict(subganal.proced,newmods=c(0:2))
 wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
@@ -143,7 +160,7 @@ text(ies.da$proced[ids],ies.da$yi[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for procedure}
 #If you want the y-axis to be expressed as a proportion
-subganal.proced=rma(yi,vi,data=ies.da,mods=~proced,method="FE")
+subganal.proced=rma(yi,vi,data=ies.da,mods=~proced,method="DL")
 preds.proced=predict(subganal.proced,newmods=c(0:2),transf=transf.ipft.hm,targ=list(ni=dat$total))
 wi=1/sqrt(ies.da$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
