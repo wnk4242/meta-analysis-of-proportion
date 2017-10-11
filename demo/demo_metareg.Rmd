@@ -43,6 +43,23 @@ ids=c(1:6)
 pos=c(1)
 text(ies$month[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
 ```
+```{r Meta-regression for year}
+#If you want to analyze two or more moderators: mods=~month+age+...
+metareg.year=rma(yi,vi,data=ies,mods=~year,method="REML",test="z")
+print(metareg.year)
+```
+```{r Scatterplot for year}
+wi=1/sqrt(ies$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+preds.year=predict(metareg.year,newmods=c(2000:2020))
+plot(ies$year,ies$yi,cex=size,pch=1,xlab="Month", ylab="Proportion",las=1)
+lines(2000:2020,preds.year$pred)
+lines(2000:2020,preds.year$ci.lb,lty="dashed")
+lines(2000:2020,preds.year$ci.ub,lty="dashed")
+ids=c(1:6)
+pos=c(1)
+text(ies$year[ids],ies$yi[ids],ids,cex=0.9,pos=pos)
+```
 ```{r Calculating individual effect sizes with logit transformation}
 ies.logit=escalc(xi=cases,ni=total,measure="PLO",data=dat)
 ```

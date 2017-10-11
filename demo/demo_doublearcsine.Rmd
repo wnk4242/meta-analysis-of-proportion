@@ -114,7 +114,7 @@ pes.subg.procedure=predict(subganal.procedure,transf=transf.ipft.hm,targ=list(ni
 dat.samevar=data.frame(estimate=c((pes.da.endoscopy$b)[1],(pes.da.microscopy$b)[1]),
                        stderror=c((pes.da.endoscopy$se)[1],(pes.da.microscopy$se)[1]),
                        tau2=subganal.procedure$tau2)
-pes.da.procedure=rma(estimate,sei=stderror,method="DL",data=dat.samevar)
+pes.da.procedure=rma(estimate,sei=stderror,method="DL",data=dat.samevar) #method="FE or other RE estimators"
 pes.procedure=predict(pes.da.procedure,transf=transf.ipft.hm,targ=list(ni=dat$total))
 #print(pes.subg.procedure[order(pes.subg.procedure$pred)],digits=6)
 print(pes.procedure,digits=6)
@@ -133,13 +133,12 @@ dat.diffvar= data.frame(estimate=c(pes.da.endoscopy$b, pes.da.microscopy$b),
                         procedure = c("endoscopy","microscopy"), 
                         tau2=round(c(pes.da.endoscopy$tau2, pes.da.microscopy$tau2),3))
 subganal.procedure=rma(estimate, sei=stderror, mods=~procedure, method="FE", data=dat.diffvar, digits=4)
-pes.da.procedure=rma(estimate, sei=stderror, method="DL", data=dat.diffvar, digits=4)
+pes.da.procedure=rma(estimate, sei=stderror, method="FE", data=dat.diffvar, digits=4) 
 pes.procedure=predict(pes.da.procedure,transf=transf.ipft.hm,targ=list(ni=dat$total))
 print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2)
 print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2)
 print(subganal.procedure,digits=2)
 print(pes.procedure,digits=6)
-print(pes.da.procedure,digits=2)
 ##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
 ##predict(pes.da.endoscopy,transf=transf.iarcsin)
 ##predict(pes.da.microscopy,transf=transf.iarcsin)

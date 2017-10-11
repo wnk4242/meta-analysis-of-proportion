@@ -105,12 +105,12 @@ pes.subg.province=predict(subganal.province)
 dat.samevar=data.frame(estimate=c((pes.guangdong$b)[1],(pes.guangxi$b)[1]),
                        stderror=c((pes.guangdong$se)[1],(pes.guangxi$se)[1]),
                        tau2=subganal.province$tau2)
-pes.province=rma(estimate,sei=stderror,method="FE",data=dat.samevar)
+pes.province=rma(estimate,sei=stderror,method="DL",data=dat.samevar) #method="FE or other RE estimators"
 pes.province=predict(pes.province)
 #print(pes.subg.province[order(pes.subg.province$pred)],digits=4)
-print(pes.province,digits=4)
-print(pes.subg.province[1],digits=4);print(pes.subg.province[19],digits=4)
 print(subganal.province,digits=4)
+print(pes.subg.province[1],digits=4);print(pes.subg.province[19],digits=4)
+print(pes.province,digits=4) 
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common among-study variance component across subgroups}
 #Calculating each subgroup summary proportion as an independent meta-analysis
@@ -126,8 +126,8 @@ pes.province=rma(estimate, sei=stderror, method="FE", data=dat.diffvar)
 pes.province=predict(pes.province)
 print(pes.guangdong,digits=5);confint(pes.guangdong,digits=5)
 print(pes.guangxi,digits=5);confint(pes.guangxi,digits=5)
-print(pes.province,digits=5)
 print(subganal.province,digits=5)
+print(pes.province,digits=5)
 ```
 ```{r Scatterplot for province}
 subganal.prov=rma(yi,vi,data=ies,mods=~prov,method="DL",weighted=TRUE)
