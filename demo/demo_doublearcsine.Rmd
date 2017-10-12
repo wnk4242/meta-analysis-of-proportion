@@ -12,6 +12,7 @@ dat=read.csv("D:/data/data_da.csv",header=T,sep=",")
 ies.da=escalc(xi=cases,ni=total,measure="PFT",data=dat,add=0)
 pes.da=rma(yi,vi,data=ies.da,method="DL",weighted=TRUE)
 pes=predict(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
+##The authors used the FE model.
 ##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
 ##pes=predict(pes.da,transf=transf.iarcsin)
 print(pes,digits=6);print(pes.da,digits=6)#Under fixed-effect model, confint () cannot be used.
@@ -139,6 +140,7 @@ print(pes.endoscopy,digits=4);print(pes.da.endoscopy,digits=2)
 print(pes.microscopy,digits=4);print(pes.da.microscopy,digits=2)
 print(subganal.procedure,digits=2)
 print(pes.procedure,digits=6)
+##The authors used the FE model.
 ##The authors used the arcsine transformation to convert double arcsine transformed proportions back to proportions. The authors did not report the reason for doing so in their article.
 ##predict(pes.da.endoscopy,transf=transf.iarcsin)
 ##predict(pes.da.microscopy,transf=transf.iarcsin)

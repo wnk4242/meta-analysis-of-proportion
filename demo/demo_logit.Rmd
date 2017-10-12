@@ -164,17 +164,30 @@ pos=c(2)
 text(ies.logit$studesg[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Scatterplot for sample size}
-subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="REML")
-preds.size=predict(subganal.size,newmods=c(0:2))
+subganal.size=rma(yi,vi,data=ies.logit,mods=~size,method="DL")
+preds.size=predict(subganal.size,newmods=c(0:2),transf=transf.ilogit)
 wi=1/sqrt(ies.logit$vi)
 size=1+3*(wi-min(wi))/(max(wi)-min(wi))
-plot(ies.logit$size,ies.logit$yi,cex=size,pch=1,las=1,xlab="Sample size", ylab="Logit event rate")
+plot(ies.logit$size,transf.ilogit(ies.logit$yi),cex=size,xlab="Sample size", ylab="Proportion")
 lines(0:2,preds.size$pred,col="navy")
 lines(0:2,preds.size$ci.lb,lty="dashed",col="maroon")
 lines(0:2,preds.size$ci.ub,lty="dashed",col="maroon")
 ids=c(1:6)
 pos=c(2)
-text(ies.logit$size[ids],ies.logit$yi[ids],ids,cex=0.9,pos=pos)
+text(ies.logit$studesg[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
+```
+```{r Scatterplot for year}
+metareg.year=rma(yi,vi,data=ies.logit,mods=~year,method="DL")
+wi=1/sqrt(ies.logit$vi)
+size=1+3*(wi-min(wi))/(max(wi)-min(wi))
+preds.year=predict(metareg.year,newmods=c(1985:2020),transf=transf.ilogit)
+plot(ies.logit$year,transf.ilogit(ies.logit$yi),cex=size,pch=1,xlab="Publication year", ylab="Proportion")
+lines(1985:2020,preds.year$pred,col="navy")
+lines(1985:2020,preds.year$ci.lb,lty="dashed",col="maroon")
+lines(1985:2020,preds.year$ci.ub,lty="dashed",col="maroon")
+ids=c(1:17)
+pos=c(3)
+text(ies.logit$year[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
