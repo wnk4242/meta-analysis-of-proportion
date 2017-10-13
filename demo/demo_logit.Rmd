@@ -4,7 +4,6 @@ install.packages(c("metafor","meta","weightr"))#When you use knitr,delete this c
 ```{r Loading packages}
 library(metafor)
 library(meta)
-library(weightr)
 ```
 ```{r Reading in data}
 dat=read.csv("D:/data/data_logit.csv",header=T,sep=",")
@@ -38,77 +37,6 @@ pes.noutlier=predict(pes.logit.noutlier,transf=transf.ilogit)
 print(pes,digits=5)
 print(pes.noutlier,digits=5)
 ```
-```{r Forest plot using metafor}
-#If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-png("forestplot.png",width=730,height=700)
-ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
-forest(ies.summary$yi,
-       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
-       slab=paste(dat$author,dat$year, sep=", "),
-       ilab=cbind(data=dat$cases, dat$total),
-       ilab.xpos=c(-0.002,-0.001),
-       rows=c(19:14, 8.5:-1.5),
-       at=c(seq(from=0,to=0.004,by=0.001)), 
-       refline=pes$pred,
-       ylim=c(-5,23),
-       xlim=c(-0.005,0.005),
-       pch=21,
-       bg="grey",
-       cex=1,
-       font=1,
-       main="Effect size by study type (RE Model)",
-       xlab="Proportion",
-       digits=4
-       )
-text(-0.005,22,pos=4,cex=1.2,font=1,"Author, Year")
-text(c(-0.0023,-0.0013),22,pos=4,cex=1.2,font=1,c("Cases", "Total"))
-text(0.003,22,pos=4,cex=1.2,font=1,"Proportion [95% CI]")
-text(-0.005,c(9.7,20.2),pos=4, cex=1.2,font=1,c("Others", "Birth Cohort"))
-addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,col="grey",digits=5,cex=1.1,mlab="")
-addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,col="grey",digits=5,cex=1.1,mlab="")
-addpoly(pes$pred,ci.lb=pes$ci.lb,ci.ub=pes$ci.ub,row=-5,col="grey",digits=5,cex=1.1,mlab="")
-text(-0.005,-5,pos=4,cex=1.1,bquote(paste("All studies (Q = ",.(formatC(pes.logit$QE, digits=1,format="f")), ", df = ", .(pes.logit$k - pes.logit$p),", p = ", .(formatC(pes.logit$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit$I2, digits=1, format="f")), "%",")")))
-text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.birthcohort$QE, digits=1, format="f")), ", df = ", .(pes.logit.birthcohort$k - pes.logit.birthcohort$p),", p = ", .(formatC(pes.logit.birthcohort$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.birthcohort$I2, digits=1, format="f")), "%",")")))
-text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subtotal(Q = ",.(formatC(pes.logit.others$QE, digits=1, format="f")),", df = ", .(pes.logit.others$k - pes.logit.others$p), ", p = ", .(formatC(pes.logit.others$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes.logit.others$I2, digits=1, format="f")), "%",")")))
-abline(h=-4)
-dev.off()
-```
-```{r Forest plot using meta}
-#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-pes.summary=metaprop(cases,total,authoryear,data=dat,byvar=studydesign,sm="PLO",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot.png",width=700,height=600)
-prop=dat$cases/dat$total
-precison=sqrt(ies.logit$vi)
-forest(pes.summary,
-       sortvar=prop,
-       xlim = c(0,4), pscale =1000, #if proportions are too low, consider rescaling proportions
-       rightcols=FALSE,
-       leftcols = c("studlab","effect", "ci"),#"event", "n","w.random" 
-       leftlabs = c("Study","Proportion", "95% C.I."),#"Cases", "Total","Weights"
-       xlab = "Proportion (‰)", 
-       fs.xlab=12,
-       fs.study=12,
-       fs.study.lables=12,
-       fs.heading=12,
-       squaresize = 0.5, col.square="navy", col.square.lines="navy",
-       col.diamond="maroon", col.diamond.lines="maroon",
-       comb.fixed=FALSE,
-       lty.random=2, #lty.fixed=0,
-       type.study="square",
-       type.random="diamond",
-       ff.random="bold", #ff.fixed="bold",
-       hetlab = "Heterogeneity:",
-       fs.hetstat=10,
-       smlab="",
-       print.Q=TRUE,
-       print.pval.Q=TRUE,
-       print.I2=TRUE,
-       print.tau2=FALSE,
-       col.by="black",
-       digits=2,
-       digits.Q=0)
-dev.off()
-```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
 #Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 yielded by pooling 0.93224 and 0.24743
 #Residual heterogeneity is heterogeneity not explained by the covariate (Thompson and Sharp, 1999). The results of the Test for Residual Heterogeneity show that there is significant unexplained variance left between all effect sizes in the dataset, which can explain why R^2 shows 0%
@@ -141,12 +69,126 @@ dat.diffvar=data.frame(estimate=c(pes.logit.birthcohort$b,pes.logit.others$b),
                        studydesign=c("Birth cohort","Others"), 
                        tau2=round(c(pes.logit.birthcohort$tau2, pes.logit.others$tau2),3))
 subganal.studydesign=rma(estimate,sei=stderror,mods=~studydesign,method="FE",data=dat.diffvar)
-pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.diffvar) #method="FE or other RE estimators"
+pes.logit.studydesign=rma(estimate,sei=stderror,method="FE",data=dat.diffvar)
 pes.studydesign=predict(pes.logit.studydesign,transf=transf.ilogit)
 print(pes.birthcohort,digits=6);print(pes.logit.birthcohort,digits=3)
 print(pes.others,digits=6);print(pes.logit.others,digits=3)
 print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
+```
+```{r Forest plot using metafor assuming a common variance component}
+ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
+png("forestplotmetafor.png",width=550,height=560)
+forest(ies.summary$yi,
+       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
+       slab=paste(dat$author,dat$year, sep=", "),
+       ilab=cbind(data=dat$cases, dat$total),
+       ilab.xpos=c(-0.002,-0.001),
+       rows=c(19:14, 8.5:-1.5),
+       at=c(seq(from=0,to=0.004,by=0.001)), 
+       refline=pes.studydesign$pred,
+       ylim=c(-5,23),
+       xlim=c(-0.005,0.005),
+       bg="navy",
+       cex=1,
+       main="Effect Size by Study Design (Mixed-Effects Model)",
+       xlab="Proportion",
+       digits=4
+       )
+addpoly(pes.subg.studydesign[1]$pred,ci.lb=pes.subg.studydesign[1]$ci.lb,ci.ub=pes.subg.studydesign[1]$ci.ub,row=12.7,col="red",digits=5,cex=1.1)
+addpoly(pes.subg.studydesign[17]$pred,ci.lb=pes.subg.studydesign[17]$ci.lb,ci.ub=pes.subg.studydesign[17]$ci.ub,row=-2.7,col="red",digits=5,cex=1.1)
+addpoly(pes.studydesign$pred,ci.lb=pes.studydesign$ci.lb,ci.ub=pes.studydesign$ci.ub,row=-4.4,col="red",digits=5,cex=1.1)
+text(-0.005,21.8,pos=4,cex=1.1,"Author, Year")
+text(c(-0.0026,-0.0014),21.8,pos=4,cex=1.1,c("Cases", "Total"))
+text(0.0023,21.8,pos=4,cex=1.1,font=1,"Proportion [95% CI]")
+text(-0.005,c(9.7,20.2),pos=4, cex=1.1,c("Others", "Birth cohort"))
+text(-0.005,-4.4,pos=4,cex=1.1,bquote(paste("Overall")))
+text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
+text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
+abline(h=-3.5)
+dev.off()
+```
+```{r Forest plot using metafor not assuming a common variance component}
+ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
+png("forestplotmetafor.png",width=550,height=560)
+forest(ies.summary$yi,
+       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
+       slab=paste(dat$author,dat$year, sep=", "),
+       ilab=cbind(data=dat$cases, dat$total),
+       ilab.xpos=c(-0.002,-0.001),
+       rows=c(19:14, 8.5:-1.5),
+       at=c(seq(from=0,to=0.004,by=0.001)), 
+       refline=pes.studydesign$pred,
+       ylim=c(-5,23),
+       xlim=c(-0.005,0.005),
+       bg="navy",
+       cex=1,
+       main="Effect Size by Study Design (Mixed-Effects Model)",
+       xlab="Proportion",
+       digits=4
+       )
+addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,col="red",digits=5,cex=1.1)
+addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,col="red",digits=5,cex=1.1)
+addpoly(pes.studydesign$pred,ci.lb=pes.studydesign$ci.lb,ci.ub=pes.studydesign$ci.ub,row=-4.4,col="red",digits=5,cex=1.1)
+text(-0.005,21.8,pos=4,cex=1.1,"Author, Year")
+text(c(-0.0026,-0.0014),21.8,pos=4,cex=1.1,c("Cases", "Total"))
+text(0.0023,21.8,pos=4,cex=1.1,font=1,"Proportion [95% CI]")
+text(-0.005,c(9.7,20.2),pos=4, cex=1.1,c("Others", "Birth cohort"))
+text(-0.005,-4.4,pos=4,cex=1.1,bquote(paste("Overall")))
+text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
+text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
+abline(h=-3.5)
+dev.off()
+```
+```{r Forest plot with meta assuming a common variance component}
+#if assuming a common tau-squared, set tau.common=TRUE and prespecify the pooled tau-squared with tau.preset=sqrt(subganal.studydesign$tau2) (note it is tau not tau-squared).
+subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
+pes.summary=metaprop(cases,
+                     total,
+                     authoryear,
+                     data=dat,
+                     byvar=studydesign,
+                     sm="PLO",
+                     method.ci="NAsm",
+                     method.tau="DL",
+                     incr=0.5,
+                     allincr=FALSE,
+                     addincr=FALSE,
+                     tau.common=TRUE,
+                     tau.preset=sqrt(subganal.studydesign$tau2),
+                     title="")
+png("forestplotmeta.png",width=700,height=600)
+prop=dat$cases/dat$total
+precison=sqrt(ies.logit$vi)
+forest(pes.summary,
+       sortvar=prop,
+       xlim = c(0,4), pscale =1000, #if proportions are too low, consider rescaling proportions
+       rightcols=FALSE,
+       leftcols = c("studlab","effect", "ci"),#"event", "n","w.random" 
+       leftlabs = c("Study","Proportion", "95% C.I."),#"Cases", "Total","Weights"
+       xlab = "Proportion (‰)", 
+       fs.xlab=12,
+       fs.study=12,
+       fs.study.lables=12,
+       fs.heading=12,
+       squaresize = 0.5, col.square="navy", col.square.lines="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",
+       comb.fixed=FALSE,
+       lty.random=2, #lty.fixed=0,
+       type.study="square",
+       type.random="diamond",
+       ff.random="bold", #ff.fixed="bold",
+       hetlab = "Heterogeneity:",
+       fs.hetstat=10,
+       smlab="",
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       print.tau2=TRUE,
+       col.by="black",
+       digits=4,
+       digits.Q=0)
+dev.off()
 ```
 ```{r Scatterplot for study design}
 #Assuming a common between-study variance component across subgroups

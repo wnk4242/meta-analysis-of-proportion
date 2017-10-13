@@ -6,7 +6,7 @@ library(metafor)
 library(meta)
 ```
 ```{r Reading in data}
-dat=read.csv("D:/data/data.csv",header=T,sep=",")
+dat=read.csv("D:/data/data_none.csv",header=T,sep=",")
 ```
 ```{r Calculating overall summary proportion}
 ies=escalc(xi=cases,ni=total,measure="PR",data=dat) 
@@ -33,21 +33,56 @@ ies.noutlier=escalc(xi=cases,ni=total,measure="PR", data=dat[-c(3,11,12),])
 pes.noutlier=rma(yi,vi,data=ies.noutlier,method="DL",weighted=TRUE)
 print(pes.noutlier)
 ```
-```{r Forest plot using metafor}
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
+#Pool within-group estimates of tau-squared (between-study variance)
+subganal.province=rma(yi,vi,data=ies,mods=~province,method="DL")
+pes.guangdong=rma(yi,vi,data=ies,mods=~province=="Guangxi",method="DL")
+pes.guangxi=rma(yi,vi,data=ies,mods=~province=="Guangdong",method="DL")
+pes.subg.province=predict(subganal.province)
+dat.samevar=data.frame(estimate=c((pes.guangdong$b)[1],(pes.guangxi$b)[1]),
+                       stderror=c((pes.guangdong$se)[1],(pes.guangxi$se)[1]),
+                       tau2=subganal.province$tau2)
+pes.province=rma(estimate,sei=stderror,method="FE",data=dat.samevar) #method="FE or other RE estimators"
+pes.province=predict(pes.province)
+#print(pes.subg.province[order(pes.subg.province$pred)],digits=4)
+print(subganal.province,digits=4)
+print(pes.subg.province[1],digits=4);print(pes.subg.province[19],digits=4)
+print(pes.province,digits=4) 
+```
+```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common among-study variance component across subgroups}
+#Calculating each subgroup summary proportion as an independent meta-analysis
+#Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
+pes.guangdong=rma(yi,vi,data=ies,subset=province=="Guangdong",method="DL")
+pes.guangxi=rma(yi,vi,data=ies,subset=province=="Guangxi",method="DL")
+dat.diffvar= data.frame(estimate=c(pes.guangdong$b, pes.guangxi$b),
+                        stderror=c(pes.guangdong$se, pes.guangxi$se),
+                        province = c("Guangdong","Guangxi"), 
+                        tau2=round(c(pes.guangdong$tau2, pes.guangxi$tau2),3))
+subganal.province=rma(estimate, sei=stderror, mods=~province, method="FE", data=dat.diffvar)
+pes.province=rma(estimate, sei=stderror, method="FE", data=dat.diffvar)
+pes.province=predict(pes.province)
+print(pes.guangdong,digits=5);confint(pes.guangdong,digits=5)
+print(pes.guangxi,digits=5);confint(pes.guangxi,digits=5)
+print(subganal.province,digits=5)
+print(pes.province,digits=5)
+```
+```{r Forest plot with metafor assuming a common variance component}
 #If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
-png("forestplot.png",width=500,height=500)
-forest(pes,
+ies.summary=summary(ies,ni=dat$total)
+png("forestplotmetafor.png",width=500,height=500)
+forest(ies.summary$yi,
+       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
        slab=paste(dat$author, dat$year, sep=", "),
        ilab=cbind(data=dat$cases, dat$total),
        ilab.xpos=c(-0.8, -0.4),
        rows=c(25:13,7.6:2.6),
        at=c(seq(from=0,to=1.1,by=0.2)), 
-       refline=pes$b,
+       refline=pes.province$pred,
        ylim=c(-2,30),
        xlim=c(-2,2.1),
        cex=0.8,
        font=6,
-       main="Effect size by province (RE Model)",
+       main="Effect size by province (ME Model)",
        xlab="Proportion",
        digits=3
        )
@@ -55,17 +90,65 @@ text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")
 text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))
 text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
 text(1.25,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
-text(-2,-1,pos=4,cex=0.8,font=1,bquote(paste("               (Q = ",.(formatC(pes$QE, digits=1, format="f")), ", df = ", .(pes$k - pes$p),", p = ", .(formatC(pes$QEp, digits=2, format="f")), "; ", I^2, " = ",.(formatC(pes$I2, digits=1, format="f")), "%",")")))
-text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangdong$QE, digits=1, format="f")), ", df = ", .(pes.guangdong$k - pes.guangdong$p),", p = ", .(formatC(pes.guangdong$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangdong$I2, digits=1, format="f")), "%",")")))
-text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subtotal(Q = ",.(formatC(pes.guangxi$QE, digits=1, format="f")),", df = ", .(pes.guangxi$k - pes.guangxi$p),", p = ", .(formatC(pes.guangxi$QEp, digits=2, format="f")),"; ", I^2, " = ",.(formatC(pes.guangxi$I2, digits=1, format="f")), "%",")")))
-addpoly(pes.guangdong,row=11.4,cex=0.8,font=1,mlab="",digits=3)
-addpoly(pes.guangxi,row=1.1,cex=0.8, font=1,mlab="",digits=3)
+text(-2,-1,pos=4,cex=0.8,font=1,bquote(paste("Overall")))
+text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subgroup")))
+text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subgroup")))
+addpoly(pes.subg.province[1]$pred,ci.lb=pes.subg.province[1]$ci.lb,ci.ub=pes.subg.province[1]$ci.ub,row=11.4,cex=0.8,mlab="",digits=3)
+addpoly(pes.subg.province[19]$pred,ci.lb=pes.subg.province[19]$ci.lb,ci.ub=pes.subg.province[19]$ci.ub,row=1.1,cex=0.8,mlab="",digits=3)
+addpoly(pes.province$pred,ci.lb=pes.province$ci.lb,ci.ub=pes.province$ci.ub,row=-1,cex=0.8,mlab="",digits=3)
+abline(h=0)
 dev.off()
 ```
-```{r Forest plot using metaprop}
-#If you want to create the forest plot automatically, use the forest function in the meta package. Numerical values in the following code are for demonstration purposes only. You need to respecify these values according to your dataset.
-pes.summary=metaprop(cases,total,author,data=dat,byvar=province,sm="PRAW",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,title="")
-png("forestplot.png",width=1000,height=1000)
+```{r Forest plot with metafor not assuming a common variance component}
+#If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
+ies.summary=summary(ies,ni=dat$total)
+png("forestplotmetafor.png",width=500,height=500)
+forest(ies.summary$yi,
+       ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
+       slab=paste(dat$author, dat$year, sep=", "),
+       ilab=cbind(data=dat$cases, dat$total),
+       ilab.xpos=c(-0.8, -0.4),
+       rows=c(25:13,7.6:2.6),
+       at=c(seq(from=0,to=1.1,by=0.2)), 
+       refline=pes.province$pred,
+       ylim=c(-2,30),
+       xlim=c(-2,2.1),
+       cex=0.8,
+       font=6,
+       main="Effect size by province (ME Model)",
+       xlab="Proportion",
+       digits=3
+       )
+text(-2, 29,pos=4,cex=0.8,font=6,"Author(s), Year")
+text(-2,c(8.9,26.3),pos=4, cex=0.8,font=6,c("Guangxi", "Guangdong"))
+text(c(-1, -0.6), 29,pos=4,cex=0.8,font=6,c("Cases", "Total"))
+text(1.25,29,pos=4,font=6,cex=0.8,"Proportion [95% CI]")
+text(-2,-1,pos=4,cex=0.8,font=1,bquote(paste("Overall")))
+text(-2,11.4,pos=4,cex=0.8,font=1,bquote(paste("Subgroup")))
+text(-2,1.1,pos=4,cex=0.8,font=3,bquote(paste("Subgroup")))
+addpoly(pes.guangdong,row=11.4,cex=0.8,mlab="",digits=3)
+addpoly(pes.guangxi,row=1.1,cex=0.8,mlab="",digits=3)
+addpoly(pes.province$pred,ci.lb=pes.province$ci.lb,ci.ub=pes.province$ci.ub,row=-1,cex=0.8,mlab="",digits=3)
+abline(h=0)
+dev.off()
+```
+```{r Forest plot with meta assuming a common variance component}
+subganal.province=rma(yi,vi,data=ies,mods=~province,method="DL")
+pes.summary=metaprop(cases,
+                     total,
+                     author,
+                     data=dat,
+                     byvar=province,
+                     sm="PRAW",
+                     method.ci="NAsm",
+                     method.tau="DL",
+                     incr=0.5,
+                     allincr=FALSE,
+                     addincr=FALSE,
+                     tau.common=TRUE,
+                     tau.preset=sqrt(subganal.province$tau2),
+                     title="")
+png("forestplotmeta.png",width=1000,height=1000)
 forest(pes.summary,
        xlim = c(0,1), pscale =1, 
        rightcols=c("effect", "ci","w.random"),
@@ -93,41 +176,9 @@ forest(pes.summary,
        print.pval.Q=TRUE,
        print.I2=TRUE,
        print.tau2=FALSE,
-       col.by="grey")
+       col.by="grey",
+       digits=4)
 dev.off()
-```
-```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
-#Pool within-group estimates of tau-squared (between-study variance)
-subganal.province=rma(yi,vi,data=ies,mods=~province,method="DL")
-pes.guangdong=rma(yi,vi,data=ies,mods=~province=="Guangxi",method="DL")
-pes.guangxi=rma(yi,vi,data=ies,mods=~province=="Guangdong",method="DL")
-pes.subg.province=predict(subganal.province)
-dat.samevar=data.frame(estimate=c((pes.guangdong$b)[1],(pes.guangxi$b)[1]),
-                       stderror=c((pes.guangdong$se)[1],(pes.guangxi$se)[1]),
-                       tau2=subganal.province$tau2)
-pes.province=rma(estimate,sei=stderror,method="DL",data=dat.samevar) #method="FE or other RE estimators"
-pes.province=predict(pes.province)
-#print(pes.subg.province[order(pes.subg.province$pred)],digits=4)
-print(subganal.province,digits=4)
-print(pes.subg.province[1],digits=4);print(pes.subg.province[19],digits=4)
-print(pes.province,digits=4) 
-```
-```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion not assuming a common among-study variance component across subgroups}
-#Calculating each subgroup summary proportion as an independent meta-analysis
-#Do not pool within-group estimates of tau-squared. This is the option used by RevMan.
-pes.guangdong=rma(yi,vi,data=ies,subset=province=="Guangdong",method="DL")
-pes.guangxi=rma(yi,vi,data=ies,subset=province=="Guangxi",method="DL")
-dat.diffvar= data.frame(estimate=c(pes.guangdong$b, pes.guangxi$b),
-                        stderror=c(pes.guangdong$se, pes.guangxi$se),
-                        province = c("Guangdong","Guangxi"), 
-                        tau2=round(c(pes.guangdong$tau2, pes.guangxi$tau2),3))
-subganal.province=rma(estimate, sei=stderror, mods=~province, method="FE", data=dat.diffvar)
-pes.province=rma(estimate, sei=stderror, method="FE", data=dat.diffvar)
-pes.province=predict(pes.province)
-print(pes.guangdong,digits=5);confint(pes.guangdong,digits=5)
-print(pes.guangxi,digits=5);confint(pes.guangxi,digits=5)
-print(subganal.province,digits=5)
-print(pes.province,digits=5)
 ```
 ```{r Scatterplot for province}
 subganal.prov=rma(yi,vi,data=ies,mods=~prov,method="DL",weighted=TRUE)
