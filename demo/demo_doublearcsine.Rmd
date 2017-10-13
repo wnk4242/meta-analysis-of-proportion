@@ -40,42 +40,6 @@ pes.noutlier=predict(pes.da.noutlier,transf=transf.ipft.hm,targ=list(ni=dat$tota
 print(pes,digits=4)
 print(pes.noutlier,digits=4)
 ```
-```{r Forest plot using metaprop assuming}
-subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="DL")
-pes.summary=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,tau.common=TRUE,tau.preset=sqrt(subganal.procedure$tau2),title="")
-png("forestplotmeta.png",width=1000,height=1000)
-forest(pes.summary,
-       xlim = c(0,1), pscale =1, 
-       rightcols=c("effect", "ci","w.random"),
-       rightlabs=c("Proportion", "95% C.I.","Weights"),
-       leftcols = c("studlab", "event", "n"), 
-       leftlabs = c("Study", "Cases", "Total"),
-       xlab = "Prevalence", 
-       fs.xlab=12,
-       fs.study=12,
-       fs.study.lables=12,
-       fs.heading=12,
-       squaresize = 0.5, col.square="navy", col.square.lines="navy",
-       col.diamond="navy", col.diamond.lines="navy",
-       comb.fixed=FALSE,
-       comb.random=TRUE,
-       lty.fixed=0,
-       lty.random=2, 
-       type.study="square",
-       type.random="diamond",
-       ff.fixed="bold.italic",
-       ff.random="bold.italic",
-       hetlab = "Heterogeneity:",
-       fs.hetstat=10,
-       smlab="",
-       print.Q=TRUE,
-       print.pval.Q=TRUE,
-       print.I2=TRUE,
-       print.tau2=FALSE,
-       col.by="grey",
-       digits=6)
-dev.off()
-```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
 #Pool within-group estimates of tau-squared
 subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="DL")
@@ -177,6 +141,42 @@ addpoly(pes.endoscopy$pred,ci.lb=pes.endoscopy$ci.lb,ci.ub=pes.endoscopy$ci.ub,r
 addpoly(pes.microscopy$pred,ci.lb=pes.microscopy$ci.lb,ci.ub=pes.microscopy$ci.ub,row=0.5,digits=6,cex=0.8,mlab="")
 addpoly(pes.procedure$pred,ci.lb=pes.procedure$ci.lb,ci.ub=pes.procedure$ci.ub,row=-3,digits=6,cex=0.8,mlab="")
 abline(h=-2)
+dev.off()
+```
+```{r Forest plot with meta assuming a common between variance}
+subganal.procedure=rma(yi,vi,data=ies.da,mods=~procedure,method="DL")
+pes.summary=metaprop(cases,total,author,data=dat,byvar=procedure,sm="PFT",method.ci="NAsm",method.tau="DL",incr=0.5,allincr=FALSE,addincr=FALSE,tau.common=TRUE,tau.preset=sqrt(subganal.procedure$tau2),title="")
+png("forestplotmeta.png",width=1000,height=1000)
+forest(pes.summary,
+       xlim = c(0,1), pscale =1, 
+       rightcols=c("effect", "ci","w.random"),
+       rightlabs=c("Proportion", "95% C.I.","Weights"),
+       leftcols = c("studlab", "event", "n"), 
+       leftlabs = c("Study", "Cases", "Total"),
+       xlab = "Prevalence", 
+       fs.xlab=12,
+       fs.study=12,
+       fs.study.lables=12,
+       fs.heading=12,
+       squaresize = 0.5, col.square="navy", col.square.lines="navy",
+       col.diamond="navy", col.diamond.lines="navy",
+       comb.fixed=FALSE,
+       comb.random=TRUE,
+       lty.fixed=0,
+       lty.random=2, 
+       type.study="square",
+       type.random="diamond",
+       ff.fixed="bold.italic",
+       ff.random="bold.italic",
+       hetlab = "Heterogeneity:",
+       fs.hetstat=10,
+       smlab="",
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       print.tau2=FALSE,
+       col.by="grey",
+       digits=6)
 dev.off()
 ```
 ```{r Scatterplot for procedure}

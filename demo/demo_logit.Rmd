@@ -76,7 +76,7 @@ print(pes.others,digits=6);print(pes.logit.others,digits=3)
 print(subganal.studydesign,digits=3)
 print(pes.studydesign,digits=6)
 ```
-```{r Forest plot using metafor assuming a common variance component}
+```{r Forest plot with metafor assuming a common variance component}
 ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
 png("forestplotmetafor.png",width=550,height=560)
 forest(ies.summary$yi,
@@ -108,7 +108,7 @@ text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
 abline(h=-3.5)
 dev.off()
 ```
-```{r Forest plot using metafor not assuming a common variance component}
+```{r Forest plot with metafor not assuming a common variance component}
 ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
 png("forestplotmetafor.png",width=550,height=560)
 forest(ies.summary$yi,

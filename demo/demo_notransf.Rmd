@@ -67,7 +67,6 @@ print(subganal.province,digits=5)
 print(pes.province,digits=5)
 ```
 ```{r Forest plot with metafor assuming a common variance component}
-#If you want to create the forest plot manually, use the forest function in the metafor package. Numerical values in the following code are for demonstration purposes only. You need to change these values according to your data.
 ies.summary=summary(ies,ni=dat$total)
 png("forestplotmetafor.png",width=500,height=500)
 forest(ies.summary$yi,
