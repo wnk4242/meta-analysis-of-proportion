@@ -23,8 +23,10 @@ abs.z=abs(stud.res$z)
 stud.res[order(-abs.z)]
 ```
 ```{r Leave-one-out analysis}
-pes.leave1out=leave1out(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total))
-print(pes.leave1out,digits=4)
+l1o=leave1out(pes.da)
+yi=l1o$estimate;vi=l1o$se^2
+forest(yi,vi,transf=transf.ipft.hm,targ=list(ni=dat$total),slab=paste(dat$author,dat$year,sep=", "),xlab="Summary proportions leaving out each study",refline=pes$pred,digits=6)
+L1O=leave1out(pes.da,transf=transf.ipft.hm,targ=list(ni=dat$total));print(L1O,digits=6)
 ```
 ```{r Baujat plot}
 baujat(pes.da)

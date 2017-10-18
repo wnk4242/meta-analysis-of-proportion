@@ -20,8 +20,11 @@ abs.z=abs(stud.res$z)
 stud.res[order(-abs.z)]
 ```
 ```{r Leave-one-out analysis}
-pes.leave1out=leave1out(pes.logit,transf=transf.ilogit)
-print(pes.leave1out,digits=5)
+l1o=leave1out(pes.logit)
+yi=l1o$estimate;vi=l1o$se^2
+forest(yi,vi,transf=transf.ilogit,slab=paste(dat$author,dat$year,sep=", "),xlab="Summary proportions leaving out each study",refline=pes$pred,digits=6)
+abline(h=0.1)
+L1O=leave1out(pes.logit,transf=transf.ilogit);print(L1O,digits=6)
 ```
 ```{r Baujat plot}
 baujat(pes.logit,xlab="Contribution to Q-statistic", ylab="Influence on Summary Proportion")
@@ -31,11 +34,10 @@ inf=influence(pes.logit)
 print(inf);plot(inf)
 ```
 ```{r Removing outliers}
-ies.logit.noutlier=escalc(xi=cases,ni=total,measure="PLO", data=dat[-c(2,3),])
-pes.logit.noutlier=rma(yi,vi,data=ies.logit.noutlier,method="DL",weighted=TRUE)
+ies.logit.noutlier=escalc(xi=cases,ni=total,measure="PLO", data=dat[-c(2,8),])
+pes.logit.noutlier=rma(yi,vi,data=ies.logit.noutlier,method="DL")
 pes.noutlier=predict(pes.logit.noutlier,transf=transf.ilogit)
-print(pes,digits=5)
-print(pes.noutlier,digits=5)
+print(pes.noutlier,digits=6)
 ```
 ```{r Calculating subgroup summary proportions, conducting subgroup analysis, and recalculating summary proportion assuming a common between-study variance component across subgroups}
 #Pool within-group estimates of tau-squared (between-study variance):0.4427 is the combined tau^2 yielded by pooling 0.93224 and 0.24743
@@ -110,43 +112,48 @@ dev.off()
 ```
 ```{r Forest plot with metafor not assuming a common variance component}
 ies.summary=summary(ies.logit,transf=transf.ilogit,ni=dat$total)
-png("forestplotmetafor.png",width=550,height=560)
+png("forestplotmetafor.png",width=550,height=550)
+par(cex=1,font=6)
 forest(ies.summary$yi,
        ci.lb=ies.summary$ci.lb,ci.ub=ies.summary$ci.ub,
+       ylim=c(-5,23),
+       xlim=c(-0.005,0.005),
        slab=paste(dat$author,dat$year, sep=", "),
        ilab=cbind(data=dat$cases, dat$total),
-       ilab.xpos=c(-0.002,-0.001),
+       ilab.xpos=c(-0.0019,-0.0005),
+       ilab.pos=2,
        rows=c(19:14, 8.5:-1.5),
        at=c(seq(from=0,to=0.004,by=0.001)), 
        refline=pes.studydesign$pred,
-       ylim=c(-5,23),
-       xlim=c(-0.005,0.005),
-       bg="navy",
-       cex=1,
-       main="Effect Size by Study Design (Mixed-Effects Model)",
-       xlab="Proportion",
+       main="",
+       xlab="Proportion (%)",
        digits=4
        )
-addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.7,col="red",digits=5,cex=1.1)
-addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,col="red",digits=5,cex=1.1)
-addpoly(pes.studydesign$pred,ci.lb=pes.studydesign$ci.lb,ci.ub=pes.studydesign$ci.ub,row=-4.4,col="red",digits=5,cex=1.1)
-text(-0.005,21.8,pos=4,cex=1.1,"Author, Year")
-text(c(-0.0026,-0.0014),21.8,pos=4,cex=1.1,c("Cases", "Total"))
-text(0.0023,21.8,pos=4,cex=1.1,font=1,"Proportion [95% CI]")
-text(-0.005,c(9.7,20.2),pos=4, cex=1.1,c("Others", "Birth cohort"))
-text(-0.005,-4.4,pos=4,cex=1.1,bquote(paste("Overall")))
-text(-0.005,12.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
-text(-0.005,-2.7,pos=4,cex=1.1,bquote(paste("Subgroup")))
-abline(h=-3.5)
+par(cex=1.2,font=7)
+addpoly(pes.birthcohort$pred,ci.lb=pes.birthcohort$ci.lb,ci.ub=pes.birthcohort$ci.ub,row=12.8,digits=5)
+addpoly(pes.others$pred,ci.lb=pes.others$ci.lb,ci.ub=pes.others$ci.ub,row=-2.7,digits=5)
+addpoly(pes.studydesign$pred,ci.lb=pes.studydesign$ci.lb,ci.ub=pes.studydesign$ci.ub,row=-4.6,digits=5)
+par(cex=1.1,font=7)
+text(-0.005,21.8,pos=4,"Study")
+text(c(-0.0026,-0.0014),21.8,pos=4,c("Cases", "Total"))
+text(0.0025,21.8,pos=4,"Proportion [95% CI]")
+text(-0.005,c(9.7,20.2),pos=4,c("Others", "Birth cohort"))
+par(cex=1,font=7)
+text(-0.005,-4.6,pos=4,c("Overall"))
+text(-0.005,12.8,pos=4,c("Subgroup"))
+text(-0.005,-2.7,pos=4,c("Subgroup"))
+abline(h=-3.7)
 dev.off()
 ```
 ```{r Forest plot with meta assuming a common variance component}
 #if assuming a common tau-squared, set tau.common=TRUE and prespecify the pooled tau-squared with tau.preset=sqrt(subganal.studydesign$tau2) (note it is tau not tau-squared).
+#precision=1/(ies.logit$vi)
 subganal.studydesign=rma(yi,vi,data=ies.logit,mods=~studydesign,method="DL")
 pes.summary=metaprop(cases,
                      total,
                      authoryear,
                      data=dat,
+                     #sortvar(precision)
                      byvar=studydesign,
                      sm="PLO",
                      method.ci="NAsm",
@@ -158,10 +165,9 @@ pes.summary=metaprop(cases,
                      tau.preset=sqrt(subganal.studydesign$tau2),
                      title="")
 png("forestplotmeta.png",width=700,height=600)
-prop=dat$cases/dat$total
 precison=sqrt(ies.logit$vi)
 forest(pes.summary,
-       sortvar=prop,
+       #sortvar=precision,
        xlim = c(0,4), pscale =1000, #if proportions are too low, consider rescaling proportions
        rightcols=FALSE,
        leftcols = c("studlab","effect", "ci"),#"event", "n","w.random" 
@@ -233,9 +239,9 @@ text(ies.logit$year[ids],transf.ilogit(ies.logit$yi)[ids],ids,cex=0.9,pos=pos)
 ```
 ```{r Funnel plot}
 #If you want the x-axis to be expressed as a logit transformed proportion, then remove the "#" sign before the following line.
-funnel(pes.logit,yaxis="sei")
+funnel(pes.logit,yaxis="ni",refline=0)
 #If you want the x-axis to be expressed as a proportion, then remove the "#" sign before the following line.
-#funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=6)
+#funnel(pes.logit,atransf=transf.ilogit,yaxis="sei",xlab="Proportion",digits=c(5,0))
 ```
 ```{r Trim and fill plot}
 pes.trimfill=trimfill(pes.logit)
@@ -246,7 +252,7 @@ funnel(pes.trimfill)
 predict(pes.trimfill,transf=transf.ilogit)
 ```
 ```{r Eggers regression test}
-regtest(pes.logit,model="lm",predictor="sei")#warning: when using knitr, the "'" in the "Egger's" should be deleted
+regtest(pes.logit,model="rma",predictor="sei")#warning: when using knitr, the "'" in the "Egger's" should be deleted
 ```
 ```{r Rank correlation}
 ranktest(pes.logit)
