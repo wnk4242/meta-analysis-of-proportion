@@ -1,5 +1,5 @@
 ```{r Installing required packages}
-install.packages(c("metafor","meta","weightr"))#When you use knitr,delete this chunk and sure every code is executable (e.g. you may need to specify your working directory)
+install.packages(c("metafor","meta","weightr"))#When you use knitr,delete this chunk and make sure every code is executable (e.g. you may need to specify your working directory)
 ```
 ```{r Loading packages}
 library(metafor)
