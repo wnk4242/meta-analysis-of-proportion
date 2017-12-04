@@ -1,0 +1,18 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+
+```{r use kable to print pdf}
+dat=read.csv("D:/data/data_logit.csv",header=T,sep=",")
+library(knitr)
+kable(dat)
+```
+```{r use pander to print pdf}
+dat=read.csv("D:/data/data_logit.csv",header=T,sep=",")
+library(pander)
+pander(dat)
+```
