@@ -1,7 +1,13 @@
-# Conducting Meta-analyses of Proportions in R
-Meta-analysis of proportions is a little different than other types of meta-analysis- it includes studies that do not use control groups. I wrote a tutorial showing you how to conduct a full meta-analysis of proportions using R, which I published in a peer-reviewed journal: https://jbds.isdsa.org/jbds/article/view/60. This repository contains the R code in this tutorial.
+## Meta-Analysis of Proportions in R: Tutorial and Code Repository
 
-***I also created a companion video tutorial to make the code more accessible. Watch on YouTube: https://www.youtube.com/watch?v=2wbXTFvaRnM
+Meta-analysis of proportions is a specialized form of meta-analysis used when studies report single-group outcomes without comparison or control groups. Unlike traditional meta-analytic methods that typically synthesize comparative effect sizes, meta-analysis of proportions integrates evidence by aggregating proportions or rates reported across multiple studies.
+
+I have published a detailed, peer-reviewed tutorial demonstrating the complete process for conducting a meta-analysis of proportions using R. This article has been cited over 200 times, reflecting its utility and impact within the research community.
+
+- 📖 **Peer-reviewed Tutorial:** [View the article](https://jbds.isdsa.org/jbds/article/view/60)  
+- 💻 **R Code:** This repository provides the complete R code used in the tutorial.  
+- ▶️ **Video Companion:** To facilitate learning, I have also produced a step-by-step video guide available on [YouTube](https://www.youtube.com/watch?v=2wbXTFvaRnM).
+
 
 ## Abstract
 
