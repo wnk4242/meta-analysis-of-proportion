@@ -1,4 +1,4 @@
-# metaprops
+# Conducting Meta-analyses of Proportions in R
 Meta-analysis of proportions is a little different than other types of meta-analysis- it includes studies that do not use control groups. This tutorial is the first out there that provides a step-by-step guide showing you how to conduct a full meta-analysis of proportions using R. 
 
 ***The tutorial has been published in a peer-reviewed journal: https://jbds.isdsa.org/jbds/article/view/60
