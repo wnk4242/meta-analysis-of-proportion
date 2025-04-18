@@ -5,7 +5,7 @@ Meta-analysis of proportions is a specialized form of meta-analysis used when st
 I have published a detailed, peer-reviewed tutorial demonstrating the complete process for conducting a meta-analysis of proportions using R. This article has been cited over 200 times, reflecting its utility and impact within the research community.
 
 - 📖 **Peer-reviewed Tutorial:** [View the article](https://jbds.isdsa.org/jbds/article/view/60)  
-- 💻 **R Code:** This repository provides the complete R code used in the tutorial.  
+- 💻 **R Code:** This repository provides the complete R code used in the tutorial. To get started, read the ReadMeFirst.txt file first.
 - ▶️ **Video Companion:** To facilitate learning, I have also produced a step-by-step video guide available on [YouTube](https://www.youtube.com/watch?v=2wbXTFvaRnM).
 
 
